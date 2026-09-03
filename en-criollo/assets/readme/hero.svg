@@ -1,0 +1,55 @@
+<svg width="100%" viewBox="0 0 1200 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="En criollo: gaucho al atardecer en la pampa, junto al horizonte y un mate">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2b1f14"/>
+      <stop offset="55%" stop-color="#4a2f1c"/>
+      <stop offset="100%" stop-color="#1a1410"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f2c94c"/>
+      <stop offset="100%" stop-color="#d9a441"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="320" rx="18" fill="url(#sky)"/>
+
+  <circle cx="990" cy="110" r="72" fill="url(#sun)"/>
+
+  <!-- pampa horizon -->
+  <path d="M0 230 Q 300 195 620 220 T 1200 210 V320 H0 Z" fill="#5c6b47" opacity="0.9"/>
+  <path d="M0 250 Q 350 225 700 245 T 1200 238 V320 H0 Z" fill="#3f4c30"/>
+
+  <!-- grass strokes -->
+  <g stroke="#7c8f5c" stroke-width="3" stroke-linecap="round" opacity="0.7">
+    <path d="M60 248 l-6 -16"/><path d="M90 252 l-4 -18"/><path d="M130 250 l-7 -15"/>
+    <path d="M980 244 l-6 -16"/><path d="M1030 248 l-5 -17"/><path d="M1090 246 l-7 -15"/>
+    <path d="M1140 250 l-4 -16"/>
+  </g>
+
+  <!-- gaucho silhouette -->
+  <g transform="translate(300,120)">
+    <!-- sombrero -->
+    <path d="M-46 18 Q0 -8 46 18 L38 22 Q0 4 -38 22 Z" fill="#1a1410"/>
+    <ellipse cx="0" cy="20" rx="10" ry="9" fill="#1a1410"/>
+    <!-- poncho -->
+    <path d="M-34 30 L34 30 L54 118 L-54 118 Z" fill="#b3502f"/>
+    <path d="M-34 30 L34 30 L54 118 L-54 118 Z" fill="none" stroke="#d9a441" stroke-width="4" stroke-dasharray="0 22" stroke-linecap="round"/>
+    <rect x="-54" y="52" width="108" height="6" fill="#d9a441"/>
+    <rect x="-54" y="76" width="108" height="6" fill="#f2e8d5" opacity="0.85"/>
+    <rect x="-54" y="100" width="108" height="6" fill="#d9a441"/>
+    <!-- facón / bombacha legs hinted by base -->
+    <path d="M-20 118 L-14 150 L2 150 L0 118 Z" fill="#1a1410"/>
+    <path d="M20 118 L14 150 L-2 150 L0 118 Z" fill="#1a1410" opacity="0"/>
+  </g>
+
+  <!-- mate -->
+  <g transform="translate(430,150)">
+    <path d="M-14 0 Q-16 22 0 26 Q16 22 14 0 Z" fill="#3f4c30"/>
+    <rect x="-2" y="-16" width="5" height="18" rx="2" fill="#c8c2b0" transform="rotate(18)"/>
+    <circle cx="6" cy="-16" r="3" fill="#c8c2b0"/>
+  </g>
+
+  <!-- wordmark -->
+  <text x="620" y="150" font-family="Georgia, 'Times New Roman', serif" font-size="64" font-weight="700" fill="#f2e8d5">en criollo</text>
+  <text x="622" y="188" font-family="-apple-system, Segoe UI, sans-serif" font-size="22" fill="#d9a441">lo técnico, contado como se cuenta al lado del fogón</text>
+</svg>
