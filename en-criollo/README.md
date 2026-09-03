@@ -1,4 +1,4 @@
-<img src="assets/readme/hero.svg" width="100%" alt="En criollo: gaucho al atardecer en la pampa, junto a un mate">
+<img src="assets/readme/hero.svg" width="100%" alt="En criollo: termo y mate al atardecer en la pampa">
 
 Vos investigás con jerga técnica. El que te lee, no. Esta skill traduce.
 
