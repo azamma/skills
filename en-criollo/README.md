@@ -34,10 +34,12 @@ Sin argumentos, calibra sola: registro informal (vos/tuteo) salvo que el canal s
 
 ## Reglas del texto que entrega
 
-- **Veredicto primero.** Si hay un sí/no en juego, va en negrita, en la primera frase.
+- **Veredicto primero.** Si hay un sí/no en juego, va en negrita, en la primera frase. El test: si el lector para después de esa frase, ¿ya tiene la respuesta?
+- **Nunca narrar el trabajo.** "Investigamos y encontramos" es resumen de la respuesta, no la respuesta.
 - **Solo lo verificado.** Si algo es inferencia, lo dice como inferencia — este texto se reenvía a clientes.
 - **Sin jerga.** Clases, colas, tablas, comandos: afuera. IDs, montos, nombres, fechas con huso horario: adentro.
-- **Corto.** Prosa en blockquote, sin tablas ni bullets, máximo ~8 frases.
+- **Tono plano.** Mala noticia = qué pasó y qué hacer. Nada de "lamentablemente".
+- **Corto.** Prosa simple, lista para copiar, máximo ~8 frases. Pasos numerados solo si el lector tiene más de una acción.
 
 ## Origen del nombre
 
