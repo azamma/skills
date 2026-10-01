@@ -1,4 +1,4 @@
-<img src="assets/readme/hero.svg?v=1" width="100%" alt="skills: silueta en code-rain estilo matrix haciendo un one-hand handstand">
+<img src="assets/readme/hero.svg?v=2" width="100%" alt="Zamma skills: lluvia de código estilo Matrix, una figura hecha de código esquiva balas arqueándose hacia atrás, y las skills en-criollo y ollama-agent terminan de cargarse">
 
 # skills
 
