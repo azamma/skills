@@ -9,6 +9,7 @@ Colección personal de [skills de Claude Code](https://docs.claude.com/en/docs/c
 | Skill | Qué hace |
 |---|---|
 | [`en-criollo`](en-criollo/) | Reescribe un hallazgo o diagnóstico técnico en criollo, corto y listo para mandar a alguien no técnico. |
+| [`ollama-agent`](ollama-agent/) | Corre un agente de Claude Code completo (herramientas, MCP, archivos) sobre un modelo de Ollama: DeepSeek, GLM, Kimi o cualquier `*:cloud`. Para delegar planes, premortems o revisiones en paralelo. |
 
 ## Cómo se usan
 
