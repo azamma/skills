@@ -1,0 +1,61 @@
+<svg width="100%" viewBox="0 0 1200 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ollama-agent: una terminal corre run.sh sobre glm-5.3-flash:cloud y el agente usa Read, Grep y Write; Claude Code completo sobre modelos de Ollama como DeepSeek, GLM, Kimi, Qwen y gpt-oss">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#16181d"/>
+      <stop offset="1" stop-color="#0c0d10"/>
+    </linearGradient>
+    <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.2" fill="#ece8e1" opacity="0.07"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="320" rx="18" fill="url(#bg)"/>
+  <rect width="1200" height="320" rx="18" fill="url(#dots)"/>
+
+  <!-- wordmark -->
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+    <text x="56" y="76" font-size="18" fill="#8b8f98">~/.claude/skills/</text>
+    <text x="52" y="138" font-size="60" font-weight="700" fill="#ece8e1">ollama<tspan fill="#d97757">-agent</tspan></text>
+  </g>
+  <g font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="22" fill="#c9c5bd">
+    <text x="56" y="184">Claude Code entero —tools, MCP, archivos—</text>
+    <text x="56" y="214">corriendo sobre un modelo de Ollama.</text>
+  </g>
+
+  <!-- swappable models -->
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="18" fill="#9fd8c4" text-anchor="middle">
+    <g stroke="#9fd8c4" stroke-opacity="0.45" stroke-width="1.5" fill="#9fd8c4" fill-opacity="0.08">
+      <rect x="56" y="244" width="109" height="36" rx="18"/>
+      <rect x="173" y="244" width="55" height="36" rx="18"/>
+      <rect x="236" y="244" width="65" height="36" rx="18"/>
+      <rect x="309" y="244" width="65" height="36" rx="18"/>
+      <rect x="382" y="244" width="98" height="36" rx="18"/>
+      <rect x="488" y="244" width="98" height="36" rx="18" stroke-dasharray="4 4"/>
+    </g>
+    <text x="110.5" y="268">deepseek</text>
+    <text x="200.5" y="268">glm</text>
+    <text x="268.5" y="268">kimi</text>
+    <text x="341.5" y="268">qwen</text>
+    <text x="431" y="268">gpt-oss</text>
+    <text x="537" y="268">*:cloud</text>
+  </g>
+
+  <!-- terminal -->
+  <g transform="translate(626,36)">
+    <rect width="526" height="248" rx="14" fill="#0a0b0d" stroke="#2a2d34" stroke-width="1.5"/>
+    <path d="M14 0 H512 A14 14 0 0 1 526 14 V36 H0 V14 A14 14 0 0 1 14 0 Z" fill="#1c1e23"/>
+    <circle cx="22" cy="18" r="6" fill="#d97757"/>
+    <circle cx="42" cy="18" r="6" fill="#4a4d55"/>
+    <circle cx="62" cy="18" r="6" fill="#4a4d55"/>
+    <text x="263" y="24" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" fill="#6d717a">claude -p → localhost:11434</text>
+
+    <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="18">
+      <text x="22" y="72" fill="#ece8e1"><tspan fill="#d97757">$</tspan> run.sh glm-5.3-flash:cloud spec.md</text>
+      <text x="65" y="100" fill="#8b8f98">--tools "Read Grep Glob Write"</text>
+      <text x="22" y="138" fill="#c9c5bd"><tspan fill="#9fd8c4">●</tspan> Read<tspan x="120">ollama-agent/SKILL.md</tspan></text>
+      <text x="22" y="166" fill="#c9c5bd"><tspan fill="#9fd8c4">●</tspan> Grep<tspan x="120">"allowedTools"</tspan></text>
+      <text x="22" y="194" fill="#c9c5bd"><tspan fill="#9fd8c4">●</tspan> Write<tspan x="120">/tmp/plan.md</tspan></text>
+      <text x="22" y="230" fill="#8b8f98">[ollama-agent] turns=12 <tspan fill="#9fd8c4">subtype=success</tspan></text>
+    </g>
+  </g>
+</svg>

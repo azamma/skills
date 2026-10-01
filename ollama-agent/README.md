@@ -1,3 +1,5 @@
+<img src="assets/readme/hero.svg?v=1" width="100%" alt="ollama-agent: Claude Code completo, con tools y MCP, sobre modelos de Ollama como DeepSeek, GLM, Kimi, Qwen y gpt-oss">
+
 # ollama-agent
 
 Correr un agente de Claude Code completo (herramientas, servidores MCP, lectura y escritura de archivos, varias vueltas) sobre un modelo que no es de Anthropic: DeepSeek, GLM, Kimi, Qwen, gpt-oss o cualquier `*:cloud` de Ollama.
