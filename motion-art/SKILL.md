@@ -125,4 +125,4 @@ surroundings, highlights and shadows.
 - `assets/vendor/`: p5 2.3.1 (LGPL-2.1) and p5.brush 2.2.3 (MIT); `render.sh` uses them offline and its
   standalone HTML loads the same versions from a CDN.
 - `scripts/`: `render.sh` (PNG, one motion frame with `QUERY="frame=N"`, or all frames with
-  `FRAMES=N`), backed by `capture.mjs` and `frames.mjs`.
+  `FRAMES=N`), backed by `capture.mjs` and `frames.mjs`; `gif.py` turns frames into a looping GIF.

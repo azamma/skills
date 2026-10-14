@@ -1,4 +1,4 @@
-<img src="assets/readme/hero.jpg" width="100%" alt="Cuatro pinturas hechas con motion-art: una máquina de chicles llena de ojos en estilo cartel de feria, una jarra de mayólica con amapolas frente a la torre de Pisa, un parabrisas con lluvia de noche y una playa vista desde arriba con juguetes">
+<p><img src="assets/readme/eye-candy.gif" width="24%" alt="Máquina de chicles llena de ojos que se revuelven y parpadean"><img src="assets/readme/pisa.gif" width="24%" alt="Jarra de mayólica con amapolas que se mecen frente a la torre de Pisa"><img src="assets/readme/rain.gif" width="24%" alt="Lluvia en un parabrisas de noche que barre el limpiaparabrisas"><img src="assets/readme/wave.gif" width="24%" alt="Playa vista desde arriba donde una ola arrastra los juguetes y retrocede"></p>
 
 # motion-art
 
@@ -23,6 +23,7 @@ Se activa sola cuando pedís una pintura con brief y colour hint, una pintura co
 scripts/render.sh sketch.js out.png                  # PNG + out.html para abrir en el navegador
 QUERY="frame=12" scripts/render.sh sketch.js f12.png  # un cuadro de la animación
 FRAMES=48 scripts/render.sh sketch.js frames/         # los 48 cuadros del clip
+uv run --with pillow python scripts/gif.py frames/ clip.gif   # GIF en loop para un README
 ```
 
 Necesita Google Chrome o Chromium (o `CHROME=/ruta/al/binario`) y Node 22+. Para armar el MP4 sin ffmpeg instalado: `uv run --with imageio --with imageio-ffmpeg`.

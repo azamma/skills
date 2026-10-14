@@ -1,4 +1,4 @@
-<img src="assets/readme/hero.jpg" width="100%" alt="Four paintings made with motion-art: a gumball machine full of eyeballs as a carnival banner, a maiolica jug of poppies in front of the Tower of Pisa, a rain-covered windshield at night, and a top-down beach with toys">
+<p><img src="assets/readme/eye-candy.gif" width="24%" alt="Gumball machine full of eyeballs that churn and blink"><img src="assets/readme/pisa.gif" width="24%" alt="Maiolica jug of poppies swaying in front of the Tower of Pisa"><img src="assets/readme/rain.gif" width="24%" alt="Rain on a windshield at night, cleared by the wiper"><img src="assets/readme/wave.gif" width="24%" alt="Top-down beach where a wave carries the toys and pulls back"></p>
 
 # motion-art
 
@@ -23,6 +23,7 @@ It triggers on its own when you ask for a painting with a brief and colour hint,
 scripts/render.sh sketch.js out.png                  # PNG + out.html to open in a browser
 QUERY="frame=12" scripts/render.sh sketch.js f12.png  # one frame of the animation
 FRAMES=48 scripts/render.sh sketch.js frames/         # all 48 frames of the clip
+uv run --with pillow python scripts/gif.py frames/ clip.gif   # looping GIF for a README
 ```
 
 Needs Google Chrome or Chromium (or `CHROME=/path/to/binary`) and Node 22+. To build the MP4 without a system ffmpeg: `uv run --with imageio --with imageio-ffmpeg`.

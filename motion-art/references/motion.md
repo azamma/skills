@@ -165,4 +165,7 @@ FRAMES=48 render.sh sketch.js frames/            # motion frames 1..48 from one 
 `FRAMES` sets `window.__mf` per frame and awaits p5's async `redraw()`, so file `fNNNN.png`
 is motion frame NNNN. Encode the clip without a system ffmpeg:
 `uv run --with imageio --with imageio-ffmpeg python -c '…iio.imwrite("clip.mp4", frames, fps=24, codec="libx264", quality=8)'`.
+For a README or docs, `uv run --with pillow python scripts/gif.py frames/ clip.gif` makes a looping
+GIF (360 px, 12 fps, one shared palette; about 1–3 MB for 2–8 s). Pass a video instead of a
+folder by adding `--with imageio --with imageio-ffmpeg`.
 Judge smoothness in a real browser; headless SwiftShader is far too slow to tell.
