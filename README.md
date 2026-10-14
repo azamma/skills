@@ -1,4 +1,4 @@
-<img src="assets/readme/hero.svg?v=2" width="100%" alt="Zamma skills: lluvia de código estilo Matrix, una figura hecha de código esquiva balas arqueándose hacia atrás, y las skills en-criollo y ollama-agent terminan de cargarse">
+<img src="assets/readme/hero.svg?v=3" width="100%" alt="Zamma skills: lluvia de código estilo Matrix, una figura hecha de código esquiva balas arqueándose hacia atrás, y las skills en-criollo, ollama-agent y motion-art terminan de cargarse">
 
 # skills
 
@@ -10,6 +10,7 @@ Colección personal de [skills de Claude Code](https://docs.claude.com/en/docs/c
 |---|---|
 | [`en-criollo`](en-criollo/) | Reescribe un hallazgo o diagnóstico técnico en criollo, corto y listo para mandar a alguien no técnico. |
 | [`ollama-agent`](ollama-agent/) | Corre un agente de Claude Code completo (herramientas, MCP, archivos) sobre un modelo de Ollama: DeepSeek, GLM, Kimi o cualquier `*:cloud`. Para delegar planes, premortems o revisiones en paralelo. |
+| [`motion-art`](motion-art/) | Pinturas hechas con código que parecen pintadas a mano, quietas o animadas: un objeto cotidiano hiperreal dentro de una tradición artística, con p5.js + p5.brush. Incluye animación a partir de una línea `MOTION:`. |
 
 ## Cómo se usan
 

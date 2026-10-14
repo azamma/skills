@@ -1,4 +1,4 @@
-<svg width="100%" viewBox="0 0 1200 320" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Zamma skills: lluvia de código estilo Matrix, una figura hecha de código esquiva balas arqueándose hacia atrás, y al lado las skills en-criollo y ollama-agent terminan de cargarse">
+<svg width="100%" viewBox="0 0 1200 320" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Zamma skills: lluvia de código estilo Matrix, una figura hecha de código esquiva balas arqueándose hacia atrás, y al lado las skills en-criollo, ollama-agent y motion-art terminan de cargarse">
 <defs>
 <g id="pose" fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" transform="translate(300,292) scale(1.0)">
   <!-- feet -->
@@ -130,10 +130,12 @@
   <g font-size="20">
     <text x="604" y="208" fill="#c8ffdc"><tspan fill="#39ff88">▸</tspan> en-criollo<tspan x="934" fill="#39ff88">✓</tspan></text>
     <text x="604" y="240" fill="#c8ffdc"><tspan fill="#39ff88">▸</tspan> ollama-agent<tspan x="934" fill="#39ff88">✓</tspan></text>
+    <text x="604" y="272" fill="#c8ffdc"><tspan fill="#39ff88">▸</tspan> motion-art<tspan x="934" fill="#39ff88">✓</tspan></text>
   </g>
   <rect x="784" y="194" width="136" height="16" rx="3" fill="#39ff88"/>
   <rect x="784" y="226" width="136" height="16" rx="3" fill="#39ff88"/>
-  <text x="604" y="284" font-size="20" font-style="italic" fill="#a8ffc6">“Ya sé kung fu.”</text>
+  <rect x="784" y="258" width="136" height="16" rx="3" fill="#39ff88"/>
+  <text x="604" y="308" font-size="20" font-style="italic" fill="#a8ffc6">“Ya sé kung fu.”</text>
 </g>
 </g>
 </svg>
