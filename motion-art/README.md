@@ -2,6 +2,8 @@
 
 # motion-art
 
+**English** · [Español](README.es.md)
+
 Code-made paintings that look hand-painted, still or moving. One everyday object rendered hyperreal inside a named art tradition (carnival banner, maiolica, shin-hanga, nautical chart), painted with p5.js 2.x + [p5.brush](https://github.com/acamposuribe/p5.brush) on a 1200x1200 canvas.
 
 ## What it does
@@ -23,7 +25,7 @@ QUERY="frame=12" scripts/render.sh sketch.js f12.png  # one frame of the animati
 FRAMES=48 scripts/render.sh sketch.js frames/         # all 48 frames of the clip
 ```
 
-Needs Google Chrome and Node 22+. To build the MP4 without a system ffmpeg: `uv run --with imageio --with imageio-ffmpeg`.
+Needs Google Chrome or Chromium (or `CHROME=/path/to/binary`) and Node 22+. To build the MP4 without a system ffmpeg: `uv run --with imageio --with imageio-ffmpeg`.
 
 ## Good to know
 
