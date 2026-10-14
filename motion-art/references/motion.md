@@ -1,6 +1,6 @@
 # Moving paintings
 
-Studied from the gallery's 26 moving paintings (`reel/`). Each is a finished still plus a
+Studied from the gallery's 26 moving paintings. Each is a finished still plus a
 motion layer: **a one-shot clip of 2 s at 24 fps (48 frames), rendered offline to video**.
 Frame 0 is the still. An impact starts the motion at about frame 2, and the scene settles by
 frame 48. The clip simply repeats. Make a seamless loop only when the brief asks for

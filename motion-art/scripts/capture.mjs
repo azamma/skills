@@ -5,10 +5,11 @@ import { spawn } from "node:child_process";
 import { writeFileSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { findChrome } from "./chrome.mjs";
 
 const [url, out, sizeArg] = process.argv.slice(2);
 const size = +sizeArg || 1200;
-const CHROME = process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const CHROME = findChrome();
 const TIMEOUT_MS = +(process.env.TIMEOUT_MS || 600000);
 const profile = mkdtempSync(join(tmpdir(), "motion-art-chrome-"));
 

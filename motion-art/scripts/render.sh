@@ -5,6 +5,7 @@
 #        FRAMES=48 render.sh <sketch.js> <outDir> [size=480]   motion frames 1..48 as PNGs, one page load
 # QUERY is appended to the page URL (e.g. to pick one motion frame, see references/motion.md).
 # TIMEOUT_MS (default 600000): full pieces take 2-3 min each under SwiftShader. Run renders one at a time.
+# CHROME=/path/to/chrome overrides the browser lookup (scripts/chrome.mjs).
 # Also writes <out>.html next to the PNG: a self-contained page that opens in any browser.
 set -euo pipefail
 
@@ -13,7 +14,6 @@ OUT="${2:-${SKETCH%.js}.png}"
 SIZE="${3:-1200}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 VENDOR="$HERE/../assets/vendor"
-CHROME="${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT

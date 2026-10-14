@@ -7,10 +7,11 @@ import { spawn } from "node:child_process";
 import { writeFileSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { findChrome } from "./chrome.mjs";
 
 const [url, outDir, nArg, sizeArg] = process.argv.slice(2);
 const N = +nArg, SIZE = +sizeArg || 480;
-const CHROME = process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const CHROME = findChrome();
 const TIMEOUT_MS = +(process.env.TIMEOUT_MS || 1800000);
 mkdirSync(outDir, { recursive: true });
 const profile = mkdtempSync(join(tmpdir(), "motion-art-chrome-"));

@@ -50,8 +50,16 @@ const lerpPt = (a, b, t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t)];
 
 ## Volume and light
 - Define one `LIGHT = normalize3([-0.4, -0.55, 0.73])` and derive every shadow and highlight from it.
-- **Sphere / bulb / fruit**: parametrise the surface (`projectBall(u, v)` returns x, y, nx, ny,
-  nz, visible). Use concentric washes that shrink and shift toward the light for the shading.
+- **Sphere / bulb / fruit**: parametrise the surface with `projectBall(u, v)` (below). Use
+  concentric washes that shrink and shift toward the light for the shading.
+  ```js
+  // u = longitude, v = latitude (radians); BALL = { cx, cy, r, tilt }. Orthographic view.
+  function projectBall(u, v) {
+    const x = cos(v) * sin(u), y = sin(v), z = cos(v) * cos(u);
+    const yt = y * cos(BALL.tilt) - z * sin(BALL.tilt), zt = y * sin(BALL.tilt) + z * cos(BALL.tilt);
+    return { x: BALL.cx + BALL.r * x, y: BALL.cy - BALL.r * yt, nx: x, ny: -yt, nz: zt, visible: zt > 0 };
+  }
+  ```
   Decoration on the surface (stripes, labels) is sampled in (u, v) and projected, so it wraps
   around the form correctly.
 - **Shading by glazes**: stack 4–10 translucent washes (opacity 15–40), each one smaller and
