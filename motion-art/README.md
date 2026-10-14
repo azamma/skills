@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/readme/hero.svg" width="100%" alt="motion-art: hand-painted pictures in code, still or moving"></p>
+
 <p><img src="assets/readme/eye-candy.gif" width="24%" alt="Gumball machine full of eyeballs that churn and blink"><img src="assets/readme/pisa.gif" width="24%" alt="Maiolica jug of poppies swaying in front of the Tower of Pisa"><img src="assets/readme/rain.gif" width="24%" alt="Rain on a windshield at night, cleared by the wiper"><img src="assets/readme/wave.gif" width="24%" alt="Top-down beach where a wave carries the toys and pulls back"></p>
 
 # motion-art

@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/readme/hero.svg" width="100%" alt="motion-art: pinturas a mano hechas con código, quietas o en movimiento"></p>
+
 <p><img src="assets/readme/eye-candy.gif" width="24%" alt="Máquina de chicles llena de ojos que se revuelven y parpadean"><img src="assets/readme/pisa.gif" width="24%" alt="Jarra de mayólica con amapolas que se mecen frente a la torre de Pisa"><img src="assets/readme/rain.gif" width="24%" alt="Lluvia en un parabrisas de noche que barre el limpiaparabrisas"><img src="assets/readme/wave.gif" width="24%" alt="Playa vista desde arriba donde una ola arrastra los juguetes y retrocede"></p>
 
 # motion-art
