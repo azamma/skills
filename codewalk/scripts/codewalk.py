@@ -1049,7 +1049,7 @@ def build_parser():
     w.add_argument("--open", action="store_true", help="also put it on screen: in the open tab, else a new browser tab")
     w.add_argument("--file", metavar="PATH", help="read the stops from PATH instead of stdin")
     w.add_argument("-n", "--dry-run", action="store_true", help="resolve and print; save nothing, start nothing")
-    w.add_argument("--no-browser", action="store_true", help="with --open: print the URL instead of launching a browser")
+    w.add_argument("--no-browser", action="store_true", help="never launch a browser: with no tab open, print the URL for the person")
     b = sub.add_parser("block", parents=[common], formatter_class=raw, help="an HTML block of a walk, to paste into an artifact",
                        description=BLOCK_DOC, epilog=EXIT_DOC)
     b.add_argument("--root", metavar="DIR", help=root_help)
@@ -1137,7 +1137,11 @@ def walk_cmd(opts, text):
         port = locate(opts.port)
         tab = bool(port) and call_server(port, "/api/status", opts.timeout)["tab"]
         port = port or start_server(opts.port, opts.timeout)
-        url, delivered = f"http://127.0.0.1:{port}/#/w/{walk['id']}", "tab" if tab else "link"
+        url = f"http://127.0.0.1:{port}/#/w/{walk['id']}"
+        # an open tab gets a notice and keeps what it shows; with none there is nothing to interrupt, so the walk opens
+        delivered = "tab" if tab else "link" if opts.no_browser else "browser"
+        if delivered == "browser":
+            webbrowser.open(url)
     data = {"id": walk["id"], "version": walk["version"], "url": url, "path": str(path), "folder": walk["folder"],
             "delivered": delivered, "title": title, "stops": brief}
     if bad:
@@ -1206,7 +1210,7 @@ def walk_line(data, dry):
     if dry:
         return f"resolved {n} stop{'s' * (n != 1)}; nothing saved"
     tell = {"tab": "the open tab lists it under Walks, with a notice", "browser": "opened in the browser",
-            "link": "no tab is open: give the person the URL"}[data["delivered"]]
+            "link": "no tab is open: give the person the URL", "none": ""}[data["delivered"]]
     return f'walk {data["id"]} v{data["version"]} · {n} stop{"s" * (n != 1)}{where} · {tell}'
 
 

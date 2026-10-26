@@ -8,7 +8,7 @@ code, each with one sentence on what to notice. The walk lands in a local Walks 
 ## What you get
 
 **The Walks page** is an inbox. New and updated walks come first, then the one you were reading, then the ones whose code
-changed since they were saved, then every walk by folder. Nothing opens on its own: a new walk shows a notice.
+changed since they were saved, then every walk by folder. A new walk never replaces what you are reading: it shows a notice.
 
 <p align="center"><img src="assets/readme/walks.png" width="100%" alt="The Walks page: a new walk with two stops not found, an updated walk that went from 3 to 5 stops, a walk to continue reading, one whose code changed, and the folders"></p>
 
@@ -22,7 +22,7 @@ sits right under it. If the agent replaces the walk you are reading, the new ver
 1. You ask. The agent writes the stops, one per line: `<repo> <target> <phrase>`.
 2. It resolves them with `codewalk.py walk -n` and fixes any it could not place, before you see anything.
 3. It saves the walk as a JSON file in `~/.codewalk/walks/`, in a folder if it fits one.
-4. The open Walks tab picks it up. With no tab open, the agent gives you the link.
+4. With no Walks tab open, the walk opens in your browser. An open tab keeps what you are reading and shows a notice instead.
 
 A target can be a path with lines or a symbol, in any language: the CLI finds the definition with `git grep` and reads
 where it ends with [Pygments](https://pygments.org/).

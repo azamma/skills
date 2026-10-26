@@ -51,13 +51,15 @@ Run every command from this skill's folder. Needs `uv` and `git`.
    - `--id ID`: replaces a saved walk (same id, version + 1, same folder). Use it to fix a walk, for a change the person
      asks for, and for the fix or refresh requests they copy from the Walks page: those name the id. A tab showing the walk
      swaps in the new version and stays on the same stop.
-   - `--open`: also puts the walk on screen now (in the open tab, else a new browser tab). Pass it only when the person
-     asked to see it now.
+   - `--open`: puts the walk on screen even when a Walks tab is open (that tab switches to it). Pass it only when the
+     person asked to see it now. Without it an open tab keeps what it shows and gets a notice; with no tab open the walk
+     opens in the browser either way.
+   - `--no-browser`: in a session with no browser (remote, CI): nothing opens, and you give the person the URL.
 
-   Done when it exits 0 and you told the person, by `data.delivered`:
-   - `tab`: it is in their Walks page, with a notice on screen.
-   - `link`: no tab is open; give them `data.url`.
-   - `browser`: it is open.
+   Done when it exits 0 and you told the person where to look, with `data.url` in your message every time:
+   - `browser`: it opened in a new browser tab.
+   - `tab`: it is in their open Walks tab, with a notice; one click opens it.
+   - `link` (`--no-browser`): nothing opened; they open `data.url`.
 
    On failure the last stderr line is `{"ok": false, "error": {code, message, fix, details}}`:
 

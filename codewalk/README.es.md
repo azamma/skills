@@ -9,7 +9,7 @@ abrís.
 ## Qué ves
 
 **La página Walks** es una bandeja. Primero los walks nuevos y actualizados, después el que estabas leyendo, después los que
-tienen código que cambió desde que se guardaron, y al final todos por carpeta. Nada se abre solo: un walk nuevo muestra un
+tienen código que cambió desde que se guardaron, y al final todos por carpeta. Un walk nuevo nunca reemplaza lo que estás leyendo: muestra un
 aviso.
 
 <p align="center"><img src="assets/readme/walks.png" width="100%" alt="La página Walks: un walk nuevo con dos paradas sin encontrar, uno actualizado que pasó de 3 a 5 paradas, un walk para seguir leyendo, uno cuyo código cambió, y las carpetas"></p>
@@ -25,7 +25,7 @@ misma parada.
 1. Preguntás. El agente escribe las paradas, una por línea: `<repo> <destino> <frase>`.
 2. Las resuelve con `codewalk.py walk -n` y corrige las que no pudo ubicar, antes de que veas nada.
 3. Guarda el walk como un JSON en `~/.codewalk/walks/`, en una carpeta si corresponde.
-4. La pestaña de Walks abierta lo levanta. Si no hay pestaña, el agente te pasa el link.
+4. Si no tenés una pestaña de Walks abierta, el walk se abre en el navegador. Si la tenés, sigue con lo que estabas leyendo y te muestra un aviso.
 
 Un destino puede ser una ruta con líneas o un símbolo, en cualquier lenguaje: el CLI encuentra la definición con `git grep`
 y lee dónde termina con [Pygments](https://pygments.org/).

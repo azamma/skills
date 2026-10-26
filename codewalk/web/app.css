@@ -14,6 +14,7 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 ::selection { background: #2e436e; color: #fff; }
 html, body { height: 100%; }
 body { overflow: hidden; }
@@ -86,10 +87,7 @@ h2 { margin: 0; font-size: 13px; font-weight: 600; color: var(--ink); }
 .walk.unseen .name { font-weight: 600; }
 .walk .meta { grid-column: 1; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; min-width: 0; color: var(--muted); font-size: 12px; }
 .hop { color: var(--muted); }
-.walk .trail { grid-column: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font: 12px/1.5 var(--code); }
-.walk .trail b { color: var(--sub); font-weight: 400; }
-.walk .trail .miss { font-style: normal; color: var(--warn); text-decoration: underline wavy color-mix(in srgb, var(--warn) 60%, transparent); text-underline-offset: 3px; }
-.walk .side { grid-column: 2; grid-row: 1 / span 3; display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; white-space: nowrap; }
+.walk .side { grid-column: 2; grid-row: 1 / span 2; display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; white-space: nowrap; }
 .fix { min-height: 24px; padding: 0 2px; color: var(--sub); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; font-size: 12px; }
 .fix:hover { color: var(--ink); }
 .more { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 6px; color: var(--muted); }
@@ -111,6 +109,24 @@ h2 { margin: 0; font-size: 13px; font-weight: 600; color: var(--ink); }
 .resume .t { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .resume .m { grid-column: 2; color: var(--muted); font-size: 12px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .resume .btn { grid-row: 1 / span 2; grid-column: 3; }
+/* a little life: the card you were reading glows like the walk's note (its aurora), and the stop you left pulses */
+.resume { --c1: #ffa94d; --c2: #3fa9f5; --c3: #1f6fd1; --c4: #ff7a45; position: relative; isolation: isolate; overflow: hidden; border-radius: 12px; }
+.resume .aurora { opacity: .55; }
+.resume .aurora i:nth-child(1) { width: 34%; left: -6%; top: -160%; }
+.resume .aurora i:nth-child(2) { width: 30%; right: 8%; bottom: -170%; }
+.resume > :not(.aurora) { position: relative; z-index: 2; }
+.strip .cur { box-shadow: 0 0 10px color-mix(in srgb, var(--new) 70%, transparent); animation: pulse 1.6s ease-in-out infinite alternate; }
+@keyframes pulse { from { opacity: .65; } to { opacity: 1; } }
+
+/* new walks: a dot that glows by the title, the spark of the section twinkles, and each row slides in the first time it shows */
+.walk.unseen::before { content: ""; position: absolute; left: 1px; top: 19px; width: 6px; height: 6px; border-radius: 50%; background: var(--new);
+  box-shadow: 0 0 8px var(--new); animation: pulse 1.8s ease-in-out infinite alternate; }
+.group-head .agent svg { animation: twinkle 3.2s ease-in-out infinite; }
+@keyframes twinkle { 0%, 70%, 100% { scale: 1; rotate: 0deg; opacity: .85; } 80% { scale: 1.25; rotate: 45deg; opacity: 1; } }
+.walk.enter { animation: row-in 420ms var(--ease) backwards; }
+.rows > .walk.enter:nth-child(2) { animation-delay: 70ms; } .rows > .walk.enter:nth-child(3) { animation-delay: 140ms; }
+.rows > .walk.enter:nth-child(4) { animation-delay: 210ms; } .rows > .walk.enter:nth-child(n+5) { animation-delay: 280ms; }
+@keyframes row-in { from { opacity: 0; translate: 0 8px; } }
 
 .archive { margin-top: 28px; border-top: 1px solid var(--line-soft); padding-top: 14px; }
 .folder { display: flex; align-items: center; gap: 10px; width: 100%; height: 36px; padding: 0 12px; border-radius: 7px; text-align: left; }
@@ -127,9 +143,9 @@ h2 { margin: 0; font-size: 13px; font-weight: 600; color: var(--ink); }
 .empty h2 { font-size: 15px; margin-bottom: 6px; }
 .empty p { margin: 0 0 14px; max-width: 54ch; }
 
-aside { display: flex; flex-direction: column; gap: 28px; padding-top: 6px; }
-aside h2 { margin-bottom: 8px; }
-aside p { margin: 0; color: var(--sub); line-height: 1.5; }
+.page aside { display: flex; flex-direction: column; gap: 28px; padding-top: 6px; }
+.page aside h2 { margin-bottom: 8px; }
+.page aside p { margin: 0; color: var(--sub); line-height: 1.5; }
 .prompt { margin: 10px 0; padding: 10px 12px; border: 1px solid var(--line-soft); border-radius: 8px; background: var(--raise); color: var(--ink); line-height: 1.5; }
 details { margin-top: 10px; color: var(--sub); font-size: 12px; }
 summary { cursor: pointer; display: inline-flex; align-items: center; gap: 6px; min-height: 24px; color: var(--muted); list-style: none; }
@@ -186,19 +202,21 @@ details pre { margin: 6px 0 0; padding: 10px 12px; border-radius: 6px; backgroun
 .files .fname { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .files .fdir { display: block; color: var(--muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .files button[aria-current="true"] .fdir { color: #c8d4ee; }
-.files .ns { margin-left: auto; color: var(--muted); font: 11px var(--code); }
+.files .ns { flex: none; margin-left: auto; color: var(--muted); font: 11px var(--code); white-space: nowrap; }
 
 .editor { min-width: 0; min-height: 0; display: flex; flex-direction: column; background: var(--bg); }
 .edhead { display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 0 16px; border-bottom: 1px solid var(--line-soft); color: var(--sub); font-size: 12px; }
 .edhead .path { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; text-align: left; }
 .edhead .loc { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border: 1px solid color-mix(in srgb, var(--agent) 45%, transparent);
   border-radius: 6px; color: var(--agent); white-space: nowrap; }
-.code { position: relative; flex: 1; min-height: 0; overflow: auto; padding: 8px 0 40vh; font: 13px/21px var(--code); font-variant-ligatures: none; color: var(--code-ink); scroll-behavior: smooth; }
+.code { position: relative; flex: 1; min-width: 0; min-height: 0; overflow: auto; padding: 8px 0 40vh; font: 13px/21px var(--code); font-variant-ligatures: none; color: var(--code-ink); scroll-behavior: smooth; }
 .ln { display: grid; grid-template-columns: 64px max-content; white-space: pre; }
 .ln .no { padding-right: 18px; text-align: right; color: #6f737a; user-select: none; }
 .ln .tx { padding-right: 32px; }
-.ln.in { background: var(--band); box-shadow: inset 2px 0 var(--band-rule); }
-.ln.in .no { color: var(--agent); }
+.ln { transition: background-color 300ms var(--ease), box-shadow 300ms var(--ease); }
+.ln .no { transition: color 300ms var(--ease); }
+.ln.in { background: color-mix(in srgb, var(--accent) 16%, transparent); box-shadow: inset 2px 0 var(--accent); }
+.ln.in .no { color: var(--ink); }
 .ln.add .no { color: var(--ok); }
 .syn-keyword { color: var(--syn-keyword); } .syn-string { color: var(--syn-string); }
 .syn-comment { color: var(--syn-comment); font-style: italic; } .syn-doc { color: var(--syn-doc); font-style: italic; }
@@ -206,19 +224,87 @@ details pre { margin: 6px 0 0; padding: 10px 12px; border-radius: 6px; backgroun
 .syn-function { color: var(--syn-function); } .syn-property { color: var(--syn-property); }
 .syn-static { color: var(--syn-property); font-style: italic; }
 
-.bubble { position: sticky; left: 76px; width: min(560px, calc(100% - 96px)); margin: 10px 0 14px 76px; padding: 14px 16px 12px; border-radius: 12px; font-family: var(--ui);
-  background: linear-gradient(var(--panel), var(--panel)) padding-box, linear-gradient(120deg, #3fa9f5aa, transparent 40%, #ff8a5c99) border-box;
-  border: 1px solid transparent; box-shadow: 0 16px 40px rgb(0 0 0 / .45); white-space: normal; }
-.bubble .bh { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
-.bubble .bh b { color: var(--new); font-weight: 600; }
-.bubble .bh .spark { color: var(--agent); }
-.bubble .phrase { margin: 8px 0 10px; color: var(--ink); font-size: 15px; line-height: 1.5; }
-.bubble .phrase code { padding: 1px 4px; border-radius: 4px; background: var(--line-soft); font: 500 .88em var(--code); color: var(--syn-function); }
-.bubble .bf { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; }
-.bubble .bar { width: 120px; height: 3px; border-radius: 2px; background: var(--line); overflow: hidden; }
-.bubble .bar i { display: block; height: 100%; width: 0; background: var(--new); }
-.bubble .bf .keys { margin-left: auto; }
-.bubble .warn { margin: 0 0 10px; padding: 6px 8px; border-radius: 6px; background: var(--warn-bg); color: var(--warn); font-size: 12px; }
+/* The bubble: placed over the code from JS (top), levitating (transform) and draggable (translate); a glass that blurs the code
+   under it, with an aurora inside and a light that laps its edge. Nothing between the code and the glass may set filter, opacity
+   or a mask: any of them stops the glass blurring the code. */
+.edbody { position: relative; flex: 1; min-height: 0; display: flex; }
+.bubble { --c1: #ffa94d; --c2: #3fa9f5; --c3: #1f6fd1; --c4: #ff7a45; position: absolute; z-index: 3; left: 76px; top: 0; width: min(540px, calc(100% - 110px));
+  pointer-events: none; font-family: var(--ui); animation: float 3.6s ease-in-out infinite alternate; transition: top 180ms var(--ease); }
+.bubble[data-bad] { --c1: #fda4af; --c2: #f87171; --c3: #e55765; --c4: #fb923c; }
+.glass { position: relative; isolation: isolate; overflow: hidden; pointer-events: auto; cursor: grab; touch-action: none; padding: 13px 16px 12px;
+  border: 1px solid rgb(255 255 255 / .06); border-radius: 12px; background: rgb(30 31 34 / .55); backdrop-filter: blur(9px) saturate(1.15);
+  box-shadow: 0 14px 44px rgb(0 0 0 / .45), 0 0 26px color-mix(in srgb, var(--c2) 13%, transparent);
+  animation: glass-in 1.1s cubic-bezier(.4, 0, .2, 1); transition: opacity 250ms var(--ease), scale 150ms ease-out; }
+.glass.held { cursor: grabbing; scale: 1.015; }
+.glass button { cursor: pointer; }
+@keyframes glass-in { from { opacity: 0; backdrop-filter: blur(0) saturate(1); } }
+@keyframes float { from { transform: translateY(0) rotate(-.25deg); } to { transform: translateY(-7px) rotate(.25deg); } }
+
+.beam { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.beam stop:nth-child(1) { stop-color: var(--c1); } .beam stop:nth-child(2) { stop-color: var(--c2); }
+.beam stop:nth-child(3) { stop-color: var(--c3); } .beam stop:nth-child(4) { stop-color: var(--c4); }
+.beam rect { x: .75px; y: .75px; width: calc(100% - 1.5px); height: calc(100% - 1.5px); rx: 11px; fill: none; stroke: url(#beam-grad); }
+.beam .glow { stroke-width: 6; filter: blur(5px); animation: breathe 4.5s ease-in-out infinite alternate; }
+.beam .ring { stroke-width: 1.6; filter: blur(1.2px); animation: breathe 4.5s ease-in-out infinite alternate; }
+@keyframes breathe { from { opacity: .3; } to { opacity: .7; } }
+
+/* a short, faint light that laps the edge slowly, cut to the border by a mask; the halo is the same light, wider and blurred */
+.run { position: absolute; inset: 0; z-index: 1; padding: 1.5px; border-radius: 12px; pointer-events: none; opacity: .55;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+.run.halo { padding: 4px; opacity: .2; }
+.run i { position: absolute; width: 170px; height: 48px; background: linear-gradient(90deg, transparent, var(--c4) 30%, var(--c1) 46%, rgb(255 255 255 / .75) 50%, var(--c2) 56%, var(--c3) 72%, transparent);
+  offset-path: inset(0 round 12px); offset-rotate: auto; animation: lap 18s linear infinite; }
+.run.halo i { filter: blur(3px); }
+@keyframes lap { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+
+/* the aurora: three soft lights that fly in from outside, then drift and change shape */
+.aurora { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.aurora i { position: absolute; aspect-ratio: 1; mix-blend-mode: screen; filter: blur(22px); }
+.aurora i:nth-child(1) { width: 62%; left: -18%; top: -40%; background: radial-gradient(circle, color-mix(in srgb, var(--c2) 42%, transparent), transparent 68%);
+  animation: drift1 17s ease-in-out infinite alternate, morph 9s ease-in-out infinite alternate, in1 2.6s cubic-bezier(.3, .1, .2, 1) both; }
+.aurora i:nth-child(2) { width: 54%; right: -14%; bottom: -55%; background: radial-gradient(circle, color-mix(in srgb, var(--c4) 38%, transparent), transparent 68%);
+  animation: drift2 23s ease-in-out infinite alternate, morph 11s ease-in-out -4s infinite alternate, in2 2.6s cubic-bezier(.3, .1, .2, 1) .35s both; }
+.aurora i:nth-child(3) { width: 40%; left: 30%; top: 10%; background: radial-gradient(circle, color-mix(in srgb, var(--c1) 22%, transparent), transparent 70%);
+  animation: drift3 29s ease-in-out infinite alternate, morph 13s ease-in-out -7s infinite alternate, in3 2.4s cubic-bezier(.3, .1, .2, 1) .7s both; }
+@keyframes in1 { 0% { translate: -60% 120%; scale: .2; rotate: -80deg; opacity: 0; } 45% { translate: 40% 70%; scale: .6; rotate: -30deg; opacity: .7; } }
+@keyframes in2 { 0% { translate: 70% -130%; scale: .2; rotate: 80deg; opacity: 0; } 45% { translate: -40% -60%; scale: .6; rotate: 30deg; opacity: .7; } }
+@keyframes in3 { 0% { translate: 160% 60%; scale: .2; rotate: -70deg; opacity: 0; } 50% { translate: 60% -50%; scale: .6; rotate: -25deg; opacity: .7; } }
+@keyframes drift1 { 50% { transform: translate(70%, 35%) scale(1.15); } 100% { transform: translate(120%, 10%) scale(.9); } }
+@keyframes drift2 { 50% { transform: translate(-80%, -30%) scale(.85); } 100% { transform: translate(-130%, -5%) scale(1.1); } }
+@keyframes drift3 { 0% { transform: scale(.9); } 50% { transform: translate(-60%, 40%) scale(1.2); } 100% { transform: translate(55%, -20%); } }
+@keyframes morph { from { border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%; } to { border-radius: 63% 37% 38% 62% / 55% 61% 39% 45%; } }
+
+.bh { display: flex; align-items: baseline; gap: 8px; font-size: 12px; color: var(--muted); }
+.bn { flex: none; color: var(--c2); font-weight: 600; font-variant-numeric: tabular-nums; }
+.bw { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--code); }
+.glass .phrase { margin: 8px 0 0; color: var(--ink); font-size: 15px; line-height: 1.55; text-shadow: 0 1px 2px rgb(0 0 0 / .35); overflow-wrap: anywhere; }
+.glass .phrase code { padding: 1px 4px; border-radius: 4px; background: rgb(255 255 255 / .08); font: 500 .88em var(--code); color: var(--syn-function); }
+.say { display: block; overflow: clip; overflow-clip-margin: 4px; }
+.say > span { display: block; animation: say 260ms var(--ease) backwards; }
+@keyframes say { from { translate: 0 100%; } }
+.glass .warn { margin: 8px 0 0; padding: 8px 10px; border-radius: 6px; background: var(--warn-bg); color: var(--warn); font-size: 12px; line-height: 1.45; }
+.bubble[data-bad] .warn { background: rgb(240 122 133 / .12); color: #f6a3ab; }
+.cands { margin: 6px 0 0; padding-left: 16px; font: 12px/1.5 var(--code); color: var(--sub); overflow-wrap: anywhere; }
+.glass .bar { margin-top: 10px; height: 3px; border-radius: 2px; background: rgb(255 255 255 / .1); overflow: hidden; }
+.glass .bar i { display: block; height: 100%; background: var(--c2); transform-origin: left; transform: scaleX(0); transition: transform 260ms linear; }
+.bf { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 12px; color: var(--muted); }
+.bf .state { margin-right: auto; }
+.bf .state[data-wait] { display: inline-flex; align-items: center; gap: 6px; color: var(--sub); }
+.bf .state[data-wait]::before { content: ""; width: 9px; height: 9px; border: 1.5px solid rgb(255 255 255 / .2); border-top-color: var(--c2); border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { rotate: 360deg; } }
+.btn.small { height: 26px; padding: 0 10px; font-size: 12px; }
+.glass .btn.small:not(.ghost) { background: rgb(255 255 255 / .1); color: var(--ink); }
+.glass .btn.small:not(.ghost):hover { background: rgb(255 255 255 / .16); }
+.glass .btn:disabled { opacity: .4; cursor: default; }
+
+/* Moving between stops (#stage[data-move], set from JS): "near" fades the bubble's text and the file name while the view scrolls and the
+   bubble travels along; "cut" fades out code, bubble and file name, and they come back in once the view jumped. The fades are on the
+   code, on the glass and on its children: never on an ancestor of the glass (it would stop blurring). */
+.code, .edhead > * { transition: opacity 250ms var(--ease); }
+.glass > :not(.aurora, .beam, .run) { transition: opacity 130ms var(--ease); }
+.stage[data-move="near"] .edhead > *, .stage[data-move="near"] .glass > :not(.aurora, .beam, .run) { opacity: 0; transition-duration: 120ms; }
+.stage[data-move="cut"] .code, .stage[data-move="cut"] .glass, .stage[data-move="cut"] .edhead > * { opacity: 0; transition-duration: 150ms; }
+.stage[data-move="cut"] .bubble, .stage[data-move="jump"] .bubble { transition: none; }
 
 .notice { margin: 48px auto; width: min(560px, calc(100% - 48px)); padding: 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
 .notice h2 { font-size: 15px; margin-bottom: 6px; }
@@ -226,35 +312,44 @@ details pre { margin: 6px 0 0; padding: 10px 12px; border-radius: 6px; backgroun
 .notice .phrase { color: var(--ink); }
 .notice ul { margin: 0 0 14px; padding-left: 18px; font: 12px/1.7 var(--code); color: var(--sub); }
 
-.stoplist { overflow: auto; padding: 14px 10px 24px; background: var(--panel); border-left: 1px solid var(--line-soft); }
+.stoplist { min-height: 0; display: flex; flex-direction: column; background: var(--panel); border-left: 1px solid var(--line-soft); }
+#stoplist { flex: 1; min-height: 0; overflow: auto; padding: 14px 10px 12px; }
+.stoplist .note { margin: 0; padding: 10px 18px 12px; border-top: 1px solid var(--line-soft); color: var(--muted); font-size: 12px; line-height: 1.45; }
 .stoplist .lh { display: flex; align-items: baseline; gap: 8px; padding: 0 8px 6px; }
 .stoplist .lh span { color: var(--muted); font-size: 12px; }
 .stoplist h3 { margin: 16px 8px 6px; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
-.stop { position: relative; display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 2px 10px; width: 100%; padding: 8px; border-radius: 8px; text-align: left; }
+.stop { position: relative; display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 2px 10px; width: 100%; padding: 9px 8px; border: 1px solid transparent; border-radius: 8px; text-align: left;
+  transition: background-color 150ms ease, border-color 150ms ease; }
+/* the route: a thread from each stop's number to the next one's, blue once walked */
+.stop:has(+ .stop)::after { content: ""; position: absolute; z-index: 1; left: 19.5px; top: 31px; bottom: -11px; width: 1px; background: rgb(255 255 255 / .14); }
+.stop.seen:has(+ .stop)::after { background: color-mix(in srgb, #3fa9f5 50%, transparent); }
 .stop:hover { background: var(--raise); }
-.stop[aria-current="step"] { background: var(--raise); box-shadow: inset 0 0 0 1px var(--line); }
-.stop .num { grid-row: 1 / span 2; display: grid; place-items: center; width: 22px; height: 22px; border: 1px solid var(--line); border-radius: 50%; color: var(--muted); font: 11px var(--code); }
-.stop.seen .num { border-color: color-mix(in srgb, var(--new) 50%, transparent); color: var(--new); }
-.stop[aria-current="step"] .num { border-color: var(--new); background: var(--new); color: #0c1a26; font-weight: 600; }
+.stop[aria-current="step"] { border-color: rgb(255 255 255 / .08); background: color-mix(in srgb, #fff 5%, var(--panel)); }
+.stop .num { position: relative; z-index: 2; grid-row: 1 / span 2; display: grid; place-items: center; width: 22px; height: 22px; border: 1px solid var(--line); border-radius: 50%;
+  background: var(--panel); color: var(--muted); font: 600 11px var(--ui); font-variant-numeric: tabular-nums; transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease; }
+.stop.seen .num { border-color: color-mix(in srgb, #3fa9f5 45%, transparent); color: var(--sub); }
+.stop[aria-current="step"] .num { border-color: #3fa9f5; background: #3fa9f5; color: #0b1220; box-shadow: 0 0 0 3px color-mix(in srgb, #3fa9f5 22%, transparent); }
 .stop .tg { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; font-family: var(--code); font-size: 12px; }
 .stop .ph { color: var(--sub); font-size: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .stop[aria-current="step"] .ph { -webkit-line-clamp: unset; }
 .stop.bad .tg, .stop.bad .num { color: var(--bad); border-color: var(--bad); }
+.stop.bad[aria-current="step"] .num { background: var(--bad); color: #1a0b0d; box-shadow: 0 0 0 3px rgb(240 122 133 / .22); }
 .stop.stale .tg::after { content: " · changed"; color: var(--warn); font-family: var(--ui); font-weight: 500; }
 
 @media (max-width: 1100px) {
   .page { grid-template-columns: minmax(0, 1fr); gap: 24px; padding: 24px 20px 64px; }
-  aside { order: 2; }
+  .page aside { order: 2; }
   .stage { grid-template-columns: minmax(0, 1fr) 280px; }
   .files { display: none; }
 }
 @media (max-width: 820px) {
-  .walk .trail, .statusbar .keys, .walk .meta .fix-wrap { display: none; }
+  .statusbar .keys, .walk .meta .fix-wrap { display: none; }
   h1 { font-size: 22px; }
   .stage { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) 34%; }
   .stoplist { border-left: 0; border-top: 1px solid var(--line-soft); }
   .walkbar .info { display: none; }
-  .bubble { left: 12px; margin-left: 12px; width: calc(100% - 24px); }
+  .bubble { left: 12px; width: calc(100% - 24px); }
+  .stoplist .note { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }

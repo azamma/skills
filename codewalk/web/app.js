@@ -27,7 +27,7 @@ const PLAYABLE = new Set(["ok", "changed"]);
 
 let walks = null, folders = [], walksDir = "~/.codewalk/walks", known = null;
 let view = { kind: "none" };
-const home = { q: "", chip: "all", deleting: new Set() };
+const home = { q: "", chip: "all", deleting: new Set(), rendered: new Set() };
 
 async function api(path, body) {
   const r = await fetch(path, body === undefined ? {} : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -137,7 +137,7 @@ function renderHome() {
 <div class="page" id="home">
   <div>
     <h1>Walks</h1>
-    <p class="lede">What your agent sent you. New walks land here; nothing opens on its own.</p>
+    <p class="lede">What your agent sent you. New walks land here and never interrupt you.</p>
     <label class="filter">${ICON.search}<span class="sr">Filter walks</span>
       <input id="q" type="search" placeholder="Filter by title, repo, file or symbol" autocomplete="off" value="${esc(home.q)}"><kbd>/</kbd></label>
     <div class="chips-filter" id="chips" role="group" aria-label="Show"></div>
@@ -187,11 +187,12 @@ function rowHtml(w) {
   const repos = w.repos.map((r) => `<span class="repo">${esc(r)}</span>`).join(`<span class="hop" aria-label="then">→</span>`);
   const fix = nf ? `<span class="fix-wrap">· <button class="fix" data-act="fix" data-id="${w.id}">Copy a fix request for your agent</button></span>`
     : ch ? `<span class="fix-wrap">· <button class="fix" data-act="fix" data-id="${w.id}">Copy a refresh request</button></span>` : "";
-  const trail = w.stops.map((s) => (BAD.has(s.status) ? `<i class="miss" title="${esc(s.status)}">${esc(s.target)}</i>` : `<b>${esc(s.target)}</b>`)).join(" › ");
-  return `<article class="walk${unseen ? " unseen" : ""}" data-id="${w.id}">
+  // a walk enters once: the first time this page shows that version of it
+  const enter = !home.rendered.has(`${w.id}:${w.version}`);
+  home.rendered.add(`${w.id}:${w.version}`);
+  return `<article class="walk${unseen ? " unseen" : ""}${enter ? " enter" : ""}" data-id="${w.id}">
   <div class="title"><a class="name" href="#/w/${w.id}">${esc(w.title)}</a>${chips.join("")}</div>
   <div class="meta">${repos}<span>· ${plural(total, "stop")}</span>${w.folder && home.flat ? `<span>· ${esc(w.folder)}</span>` : ""}${fix}</div>
-  <div class="trail">${trail}</div>
   <div class="side"><time datetime="${esc(w.updated)}">${ago(w.updated)}</time>
     <button class="more" data-act="menu" data-id="${w.id}" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for ${esc(w.title)}">${ICON.more}</button></div>
 </article>`;
@@ -211,7 +212,7 @@ function resumeHtml(ws) {
   const { w, r } = best, stop = w.stops[r.n - 1];
   const strip = w.stops.slice(0, 14).map((_, i) => `<i class="${i + 1 < r.n ? "done" : i + 1 === r.n ? "cur" : ""}"></i>`).join("");
   return `<section class="group"><div class="group-head"><h2>Continue reading</h2></div>
-  <div class="resume"><span class="strip" aria-hidden="true">${strip}</span><span class="t">${esc(w.title)}</span>
+  <div class="resume"><div class="aurora" aria-hidden="true"><i></i><i></i></div><span class="strip" aria-hidden="true">${strip}</span><span class="t">${esc(w.title)}</span>
   <span class="m">Stop ${r.n} of ${w.stops.length} · ${esc(stop?.target)} · you were here ${ago(new Date(r.at).toISOString())}</span>
   <a class="btn primary" href="#/w/${w.id}">Resume</a></div></section>`;
 }
@@ -322,6 +323,25 @@ function deleteWalk(w) {
 
 // ---------------------------------------------------------------- one walk
 
+const still = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
+const MOVE_MS = { near: 120, cut: 150 };
+
+// Top of the bubble in a view `viewH` tall, for a range from `top` to `bottom` (view pixels, either may be off screen): under the
+// range when it fits, else above it, and always inside the view.
+function bubbleTop({ top, bottom, height, viewH, gap = 10 }) {
+  const y = bottom + gap + height <= viewH ? bottom + gap : top - gap - height >= 0 ? top - gap - height : viewH - height - gap;
+  return Math.min(Math.max(y, 0), Math.max(0, viewH - height));
+}
+
+// A damped spring from 0 to 1 sampled into a CSS linear() easing: it overshoots and settles, the bubble going home.
+function springEasing({ damping = 0.5, cycles = 2, samples = 40 } = {}) {
+  const w = 2 * Math.PI * cycles, wd = w * Math.sqrt(1 - damping ** 2);
+  const at = (t) => 1 - Math.exp(-damping * w * t) * (Math.cos(wd * t) + ((damping * w) / wd) * Math.sin(wd * t));
+  return `linear(${Array.from({ length: samples + 1 }, (_, i) => (i === samples ? 1 : +at(i / samples).toFixed(4))).join(", ")})`;
+}
+const SPRING = springEasing();
+
 function renderWalkShell() {
   const { walk } = view;
   const repos = new Set(walk.stops.map((s) => s.repo)).size;
@@ -333,17 +353,46 @@ function renderWalkShell() {
     <button class="icon-btn" data-act="prev" aria-label="Previous stop" title="Previous stop (←)">${ICON.prev}</button>
     <button class="icon-btn on" data-act="toggle" id="toggle" aria-label="Pause" title="Pause (Space)">${ICON.pause}</button>
     <button class="icon-btn" data-act="next" aria-label="Next stop" title="Next stop (→)">${ICON.next}</button>
-    <span class="pos" id="pos" aria-live="polite"></span><span class="mode" id="mode"></span>
+    <span class="pos" id="pos"></span><span class="mode" id="mode"></span>
   </div>
 </div>
-<div class="stage">
+<div class="stage" id="stage">
   <nav class="files" id="files" aria-label="Files in this walk"></nav>
-  <section class="editor" aria-label="Code"><div class="edhead" id="edhead"></div><div class="code" id="code" tabindex="0"></div></section>
-  <nav class="stoplist" id="stoplist" aria-label="Stops"></nav>
+  <section class="editor" aria-label="Code">
+    <div class="edhead" id="edhead"></div>
+    <div class="edbody">
+      <div class="code" id="code" tabindex="0"></div>
+      <div class="bubble" id="bubble" role="status" aria-live="polite" hidden>
+        <div class="glass" id="glass">
+          <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+          <svg class="beam" aria-hidden="true"><linearGradient id="beam-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0"/><stop offset=".4"/><stop offset=".7"/><stop offset="1"/></linearGradient><rect class="glow"/><rect class="ring"/></svg>
+          <span class="run halo" aria-hidden="true"><i></i></span><span class="run" aria-hidden="true"><i></i></span>
+          <div class="bh"><span class="bn" id="b-n"></span><span class="bw" id="b-where"></span></div>
+          <p class="phrase" id="b-phrase"></p>
+          <p class="warn" id="b-warn" hidden></p>
+          <ul class="cands" id="b-cands" hidden></ul>
+          <div class="bar" id="b-bar"><i id="b-fill"></i></div>
+          <div class="bf"><span class="state" id="b-state"></span>
+            <button class="btn small ghost" data-act="fix" id="b-fix" hidden>${ICON.copy}Copy a fix request</button>
+            <button class="btn small ghost" data-act="toggle" id="b-auto">Keep going</button>
+            <button class="btn small" data-act="next" id="b-next">Next ⟩</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <aside class="stoplist"><nav id="stoplist" aria-label="Stops"></nav><p class="note">At reading pace, about 200 words a minute. ← → or a click switches to manual; drag the note to see under it.</p></aside>
 </div>
 <footer class="statusbar"><span class="dot" aria-hidden="true"></span><span>${esc(walk.repos.map((r) => `${r.name} @ ${r.branch ?? "detached"}`).join(" · "))}</span>
   <span class="keys"><span><kbd>←</kbd><kbd>→</kbd> step</span><span><kbd>Space</kbd> pause</span><span><kbd>Esc</kbd> back to Walks</span></span></footer>`;
   $("#view").onclick = onWalkClick;
+  view.shown = null;
+  view.first = true;
+  const code = $("#code");
+  code.addEventListener("scroll", placeSoon, { passive: true });
+  code.addEventListener("scrollend", () => { view.landing = null; placeSoon(); });
+  new ResizeObserver(placeSoon).observe(code);
+  new ResizeObserver(placeSoon).observe($("#bubble"));
+  dragBubble($("#glass"));
   renderSides();
 }
 
@@ -361,8 +410,8 @@ function renderSides() {
   $("#files").innerHTML = files.map((f) => {
     const head = f.repo !== last ? `<h2>${esc(f.repo)}</h2>` : "";
     last = f.repo;
-    const parts = f.file.split("/"), name = parts.pop();
-    return `${head}<button data-act="file" data-n="${f.ns[0]}" data-key="${esc(f.repo + "\n" + f.file)}">${ICON.file}<span class="fname">${esc(name)}<span class="fdir">${esc(parts.join("/") || ".")}</span></span><span class="ns">${f.ns.join(" ")}</span></button>`;
+    const parts = f.file.split("/"), name = parts.pop(), ns = f.ns.length > 3 ? `${f.ns[0]}…${f.ns.at(-1)}` : f.ns.join(" ");
+    return `${head}<button data-act="file" data-n="${f.ns[0]}" data-key="${esc(f.repo + "\n" + f.file)}" title="${esc(f.file)}">${ICON.file}<span class="fname">${esc(name)}${parts.length ? `<span class="fdir">${esc(parts.join("/"))}</span>` : ""}</span><span class="ns" title="Stops ${f.ns.join(", ")}">${ns}</span></button>`;
   }).join("") || `<p class="lede">No file could be located.</p>`;
   let html = `<div class="lh"><h2>Walk</h2><span>${plural(walk.stops.length, "stop")}</span></div>`;
   walk.stops.forEach((s, i) => {
@@ -393,108 +442,238 @@ async function fileRows(s) {
 }
 
 const runsHtml = (runs) => runs.map(([t, c]) => (c ? `<span class="${c}">${esc(t)}</span>` : esc(t))).join("");
+const keyOf = (s) => `${view.walk.version}:${s.repo}:${s.file}`;
+
+// How the screen goes from one stop to the next: "near" (same file, the range within reach: the view scrolls there, the bubble goes
+// along and its text crossfades), "cut" (anything else: code and bubble fade out, the view jumps, they come back in) or "jump" (the
+// first stop, or reduced motion). #stage[data-move] holds it while it lasts; the CSS does the fading.
+function moveOf(s) {
+  const code = $("#code"), row = view.shown === keyOf(s) ? code.querySelector(`.ln[data-n="${s.lines[0]}"]`) : null;
+  return row && Math.abs(row.offsetTop - code.scrollTop) <= code.clientHeight * 1.5 ? "near" : "cut";
+}
 
 async function go(i, mode = view.mode) {
   const { walk } = view;
   if (i < 0 || i >= walk.stops.length) return;
+  const back = i < view.cur;
   view.cur = i;
   view.mode = mode;
   view.seenStops.add(i);
-  const s = walk.stops[i], ticket = (view.ticket = (view.ticket ?? 0) + 1);
+  view.deadline = null;
+  const s = walk.stops[i], token = (view.ticket = (view.ticket ?? 0) + 1), live = () => token === view.ticket && view.kind === "walk";
   const reading = store.get("reading", {});
   reading[walk.id] = { n: s.n, version: walk.version, at: Date.now() };
   store.set("reading", reading);
+  paintStops();
+  const playable = PLAYABLE.has(s.status);
+  const move = view.first || still() ? "jump" : playable ? moveOf(s) : "cut";
+  if (!view.first) $("#bubble").getAnimations({ subtree: true }).filter((a) => a.animationName === "glass-in").forEach((a) => a.finish());
+  view.first = false;
+  const stage = $("#stage"), gone = sleep(MOVE_MS[move] ?? 0);
+  stage.dataset.move = move;
+  const rows = playable && view.shown !== keyOf(s) ? fileRows(s).catch((err) => ({ error: err.message })) : null;
+  await gone;
+  if (!live()) return;
+  const code = $("#code"), head = $("#edhead");
+  let shownOk = playable;
+  if (rows) {
+    const r = await rows;
+    if (!live()) return;
+    if (r.error) { shownOk = false; s.why = r.error; }
+    else {
+      code.innerHTML = r.map((runs, k) => `<div class="ln" data-n="${k + 1}"><span class="no">${k + 1}</span><span class="tx">${runsHtml(runs) || " "}</span></div>`).join("");
+      view.shown = keyOf(s);
+    }
+  }
+  if (!shownOk) { code.innerHTML = ""; view.shown = null; view.range = []; }
+  head.innerHTML = shownOk
+    ? `<span class="path">${esc(s.repo)} / ${esc(s.file)}</span><span class="loc">${ICON.pin}Stop ${s.n} · ${s.lines[0] === s.lines[1] ? `line ${s.lines[0]}` : `lines ${s.lines[0]}–${s.lines[1]}`}</span>`
+    : `<span class="path">${esc(s.repo)} · ${esc(s.target)}</span>`;
+  if (shownOk) {
+    code.querySelectorAll(".ln.in").forEach((r) => r.classList.remove("in"));
+    view.range = [];
+    for (let n = s.lines[0]; n <= s.lines[1]; n++) { const r = code.querySelector(`.ln[data-n="${n}"]`); if (r) { r.classList.add("in"); view.range.push(r); } }
+    if (view.range.length) reveal(move !== "near");
+  }
+  $("#bubble").hidden = false;
+  placeBubble();
+  paintBubble(s, shownOk);
+  placeBubble();
+  void $("#bubble").offsetHeight;
+  delete stage.dataset.move;
+  // a cut comes in from the side the walk went to: from below going on, from above going back
+  if (move === "cut" && !still()) for (const el of [code, $("#bubble")]) el.animate([{ translate: `0 ${back ? -8 : 8}px` }, { translate: "0 0" }], { duration: 250, easing: "cubic-bezier(0.23, 1, 0.32, 1)" });
+  restartDwell();
+}
+
+function paintStops() {
+  const { walk, cur } = view, s = walk.stops[cur];
   for (const el of document.querySelectorAll(".stop")) {
     const k = Number(el.dataset.i);
-    el.toggleAttribute("aria-current", false);
-    if (k === i) el.setAttribute("aria-current", "step");
-    el.classList.toggle("seen", view.seenStops.has(k) && k !== i);
+    k === cur ? el.setAttribute("aria-current", "step") : el.removeAttribute("aria-current");
+    el.classList.toggle("seen", view.seenStops.has(k) && k !== cur);
   }
-  $(".stop[aria-current]")?.scrollIntoView({ block: "nearest" });
+  $(".stop[aria-current]")?.scrollIntoView({ block: "nearest", behavior: still() ? "auto" : "smooth" });
   for (const el of document.querySelectorAll(".files button")) el.setAttribute("aria-current", String(el.dataset.key === `${s.repo}\n${s.file}`));
   $("#pos").textContent = `Stop ${s.n} of ${walk.stops.length}`;
-  const code = $("#code"), head = $("#edhead");
-  if (!PLAYABLE.has(s.status)) {
-    head.innerHTML = `<span class="path">${esc(s.repo)} · ${esc(s.target)}</span>`;
-    code.innerHTML = noticeHtml(s);
-    return restartTimer(0);
+}
+
+// The range starts a third of the way down; one taller than most of the view starts at its top instead.
+function reveal(instant) {
+  const code = $("#code"), a = view.range[0], z = view.range.at(-1);
+  const at = z.offsetTop + z.offsetHeight - a.offsetTop > code.clientHeight * 0.6 ? a.offsetTop - 24 : a.offsetTop - code.clientHeight / 3;
+  const to = Math.min(Math.max(0, at), code.scrollHeight - code.clientHeight);
+  view.landing = instant || still() ? null : to;
+  code.scrollTo({ top: to, behavior: view.landing === null ? "instant" : "smooth" });
+}
+
+// Until a smooth scroll lands, the bubble is placed for the range as it will be then: it glides once to its spot.
+function placeBubble() {
+  const bubble = $("#bubble"), code = $("#code");
+  if (!bubble || bubble.hidden) return;
+  if (!view.range?.length) return void (bubble.style.top = "16px");
+  if (view.landing != null && Math.abs(code.scrollTop - view.landing) < 1) view.landing = null;
+  const ahead = view.landing == null ? 0 : code.scrollTop - view.landing;
+  const a = view.range[0], z = view.range.at(-1);
+  bubble.style.top = `${bubbleTop({ top: a.offsetTop - code.scrollTop + ahead, bottom: z.offsetTop + z.offsetHeight - code.scrollTop + ahead, height: bubble.offsetHeight, viewH: code.clientHeight })}px`;
+}
+let placing = 0;
+function placeSoon() { cancelAnimationFrame(placing); placing = requestAnimationFrame(placeBubble); }
+
+// The phrase of a new stop comes in line by line, each line sliding up from behind its own mask. Once in, the masks go back to
+// plain inline text, so it rewraps when the bubble changes width.
+function say(phrase) {
+  const el = $("#b-phrase");
+  if (el.dataset.said === phrase) return;
+  el.dataset.said = phrase;
+  el.innerHTML = phraseHtml(phrase);
+  if (still()) return;
+  const words = [];
+  for (const node of [...el.childNodes]) {
+    if (node.nodeType !== 3) { words.push(node); continue; }
+    for (const w of node.textContent.split(/(?<=\s)/)) if (w) words.push(Object.assign(document.createElement("span"), { textContent: w }));
   }
-  let rows;
-  try { rows = await fileRows(s); } catch (err) {
-    if (ticket === view.ticket) { code.innerHTML = noticeHtml({ ...s, status: "missing", why: err.message }); restartTimer(0); }
-    return;
-  }
-  if (ticket !== view.ticket) return;
-  const [a, b] = s.lines;
-  head.innerHTML = `<span class="path">${esc(s.repo)} / ${esc(s.file)}</span><span class="loc">${ICON.pin}Stop ${s.n} · ${esc(s.target)} · ${a === b ? `line ${a}` : `lines ${a}–${b}`}</span>`;
-  let html = "";
-  rows.forEach((runs, k) => {
-    const n = k + 1, inside = n >= a && n <= b;
-    html += `<div class="ln${inside ? " in" : ""}" data-n="${n}"><span class="no">${n}</span><span class="tx">${runsHtml(runs) || " "}</span></div>`;
-    if (n === b) html += bubbleHtml(s);
+  el.replaceChildren(...words);
+  const lines = [];
+  for (const w of words) if (lines.at(-1)?.[0].offsetTop === w.offsetTop) lines.at(-1).push(w); else lines.push([w]);
+  const masks = lines.map((ws, i) => {
+    const mask = Object.assign(document.createElement("span"), { className: "say" }), line = document.createElement("span");
+    line.style.animationDelay = `${i * 40}ms`;
+    line.append(...ws);
+    mask.append(line);
+    return mask;
   });
-  const sameFile = view.shownFile === `${walk.version}:${s.repo}:${s.file}`;
-  code.innerHTML = html;
-  view.shownFile = `${walk.version}:${s.repo}:${s.file}`;
-  const first = code.querySelector(`.ln[data-n="${a}"]`);
-  if (first) {
-    const target = Math.max(0, first.offsetTop - code.clientHeight * 0.22);
-    code.scrollTo({ top: target, behavior: sameFile && Math.abs(code.scrollTop - target) < code.clientHeight * 1.5 ? "smooth" : "instant" });
-  }
-  restartTimer(readingMs(s.phrase, b - a + 1));
+  el.replaceChildren(...masks);
+  setTimeout(() => masks.forEach((m) => m.removeAttribute("class")), 260 + lines.length * 40);
 }
 
-function bubbleHtml(s) {
-  const warn = s.status === "changed" ? `<p class="warn">The code changed since this walk was saved: these lines may be off. Copy a refresh request from Walks and your agent resends it.</p>` : "";
-  return `<div class="bubble" role="note" aria-label="Stop ${s.n}"><div class="bh"><span class="spark">${ICON.spark}</span><b>${s.n} / ${view.walk.stops.length}</b><span>${esc(s.repo)} · ${esc(s.target)}</span></div>
-  ${warn}<p class="phrase">${phraseHtml(s.phrase)}</p>
-  <div class="bf"><span class="bar"><i id="bar"></i></span><span id="left"></span><span class="keys">← → step · Space pause</span></div></div>`;
+function paintBubble(s, shownOk) {
+  const n = view.walk.stops.length, bad = !shownOk, last = view.cur === n - 1;
+  const bubble = $("#bubble");
+  bubble.toggleAttribute("data-bad", bad);
+  $("#b-n").textContent = `${s.n} / ${n}`;
+  $("#b-where").textContent = `${s.repo} · ${s.target}`;
+  say(s.phrase);
+  const why = !shownOk ? {
+    unresolved: `Not found: ${s.target} is not in ${s.repo} as written. It may have been renamed, or live on another branch.`,
+    ambiguous: "More than one place matches. Your agent can resend the stop with one of these as its target:",
+    missing: "This code is gone: the file or its lines are no longer there.",
+  }[s.status] ?? `This stop cannot show${s.why ? `: ${s.why}` : ""}.` : s.status === "changed" ? "The code changed since this walk was saved: these lines may be off." : "";
+  $("#b-warn").hidden = !why;
+  $("#b-warn").textContent = why;
+  $("#b-cands").hidden = !(bad && s.candidates?.length);
+  $("#b-cands").innerHTML = (s.candidates ?? []).map((c) => `<li>${esc(c)}</li>`).join("");
+  $("#b-fix").hidden = !bad && s.status !== "changed";
+  paintMode();
+  $("#b-next").innerHTML = bad ? "Skip ⟩" : "Next ⟩";
+  $("#b-next").disabled = last;
 }
 
-function noticeHtml(s) {
-  const head = { unresolved: "Not found", ambiguous: "More than one place matches", missing: "This code is gone" }[s.status] ?? "Cannot show this stop";
-  const body = s.status === "ambiguous" ? "Your agent can resend the stop with one of these as its target:"
-    : s.status === "missing" ? `The file or its lines are no longer there${s.why ? ` (${esc(s.why)})` : ""}. Your agent can resend the walk.`
-      : `${esc(s.target)} is not in ${esc(s.repo)} as written: it may have been renamed, or live on another branch.`;
-  return `<div class="notice"><h2>${head}</h2><p class="phrase">${phraseHtml(s.phrase)}</p><p>${body}</p>
-    ${s.candidates?.length ? `<ul>${s.candidates.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>` : ""}
-    <button class="btn ghost" data-act="fix">${ICON.copy}Copy a fix request for your agent</button></div>`;
+function paintMode() {
+  const s = view.walk.stops[view.cur], ok = PLAYABLE.has(s.status), auto = view.mode === "auto";
+  $("#b-bar").hidden = !(auto && ok);
+  $("#b-auto").hidden = auto;
+  $("#b-auto").textContent = view.mode === "done" ? "From the start" : "Keep going";
+  $("#b-next").hidden = auto && ok;
+  const mode = $("#mode");
+  mode.className = `mode${auto ? "" : " manual"}`;
+  mode.textContent = { auto: "Auto-advance", paused: "Paused", manual: "Manual", done: "End of the walk" }[view.mode];
+  const t = $("#toggle");
+  t.innerHTML = auto ? ICON.pause : ICON.play;
+  t.setAttribute("aria-label", auto ? "Pause" : "Play");
+  t.classList.toggle("on", auto);
+  tickBubble();
+}
+
+// The reading time left: the bar and "next in N s" ("Paused" with a spinning ring while the bubble is held).
+function tickBubble() {
+  const s = view.walk.stops[view.cur], state = $("#b-state");
+  if (!state) return;
+  state.toggleAttribute("data-wait", view.held != null && view.mode === "auto");
+  if (view.mode !== "auto" || view.deadline == null) { state.textContent = { paused: "Paused", manual: "", done: "End of the walk", auto: "" }[view.mode]; return; }
+  const total = readingMs(s.phrase, s.lines ? s.lines[1] - s.lines[0] + 1 : 0), left = Math.max(0, view.deadline - performance.now());
+  $("#b-fill").style.transform = `scaleX(${total ? 1 - left / total : 1})`;
+  state.textContent = view.held != null ? "Paused" : `next in ${Math.ceil(left / 1000)} s · ← → by hand`;
 }
 
 // The player: "auto" advances when a stop's reading time runs out (passing over stops that cannot show), "paused" holds it,
 // "manual" is the person stepping, "done" is auto past the last stop.
-function restartTimer(ms) {
+function restartDwell() {
+  const s = view.walk.stops[view.cur];
+  view.deadline = view.mode === "auto" && PLAYABLE.has(s.status) ? performance.now() + readingMs(s.phrase, s.lines[1] - s.lines[0] + 1) : null;
+  if (view.mode === "auto" && !PLAYABLE.has(s.status)) view.deadline = performance.now() + 2500;
+  paintMode();
   cancelAnimationFrame(view.raf);
-  view.dwell = ms; view.elapsed = 0; view.t0 = performance.now();
-  tick();
+  view.raf = requestAnimationFrame(tick);
 }
 function tick() {
   if (view.kind !== "walk") return;
-  const running = view.mode === "auto";
-  const elapsed = view.elapsed + (running ? performance.now() - view.t0 : 0);
-  const bar = $("#bar"), left = $("#left");
-  if (bar) bar.style.width = `${view.dwell ? Math.min(100, (elapsed / view.dwell) * 100) : 0}%`;
-  if (left) left.textContent = view.mode === "auto" ? `next in ${Math.max(1, Math.ceil((view.dwell - elapsed) / 1000))} s` : view.mode === "paused" ? "paused" : view.mode === "done" ? "end of the walk" : "manual";
-  const mode = $("#mode");
-  if (mode) {
-    mode.className = `mode${view.mode === "auto" ? "" : " manual"}`;
-    mode.textContent = { auto: "Auto-advance", paused: "Paused", manual: "Manual", done: "Done" }[view.mode];
-  }
-  const t = $("#toggle");
-  if (t) { const playing = view.mode === "auto"; t.innerHTML = playing ? ICON.pause : ICON.play; t.setAttribute("aria-label", playing ? "Pause" : "Play"); t.classList.toggle("on", playing); }
-  if (running && elapsed >= view.dwell) {
+  const now = performance.now();
+  if (view.held != null) { if (view.deadline != null) view.deadline += now - view.held; view.held = now; }
+  else if (view.mode === "auto" && view.deadline != null && now >= view.deadline) {
     const next = view.walk.stops.findIndex((s, i) => i > view.cur && PLAYABLE.has(s.status));
-    if (next < 0) { view.mode = "done"; view.elapsed = elapsed; return tick(); }
-    return go(next, "auto");
+    if (next < 0) { view.mode = "done"; view.deadline = null; paintMode(); return; }
+    return void go(next, "auto");
   }
+  tickBubble();
   view.raf = requestAnimationFrame(tick);
 }
 function toggle() {
-  if (view.mode === "auto") { view.elapsed += performance.now() - view.t0; view.mode = "paused"; }
-  else { if (view.mode === "done") return go(Math.max(0, view.walk.stops.findIndex((s) => PLAYABLE.has(s.status))), "auto"); view.mode = "auto"; view.t0 = performance.now(); if (view.elapsed >= view.dwell) view.elapsed = 0; }
-  tick();
+  if (view.mode === "auto") { view.left = view.deadline == null ? null : view.deadline - performance.now(); view.mode = "paused"; view.deadline = null; paintMode(); return; }
+  if (view.mode === "done") return void go(Math.max(0, view.walk.stops.findIndex((s) => PLAYABLE.has(s.status))), "auto");
+  const wasPaused = view.mode === "paused";
+  view.mode = "auto";
+  if (wasPaused && view.left != null) { view.deadline = performance.now() + view.left; paintMode(); cancelAnimationFrame(view.raf); view.raf = requestAnimationFrame(tick); }
+  else restartDwell();
 }
 const step = (d) => go(Math.min(Math.max(view.cur + d, 0), view.walk.stops.length - 1), "manual");
+
+// The person can pull the bubble off the code to see under it; let go and it springs back. While held, the reading time stops.
+// It moves by `translate`, which composes with the levitation (transform) and the placement (top).
+function dragBubble(glass) {
+  glass.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0 || e.target.closest("button")) return;
+    e.preventDefault();
+    const [x0 = 0, y0 = 0] = (getComputedStyle(glass).translate.match(/-?[\d.]+/g) ?? []).map(Number);
+    glass.getAnimations().filter((a) => a.id === "home").forEach((a) => a.cancel());
+    const sx = e.clientX - x0, sy = e.clientY - y0;
+    const move = (m) => { glass.style.translate = `${m.clientX - sx}px ${m.clientY - sy}px`; };
+    move(e);
+    glass.setPointerCapture(e.pointerId);
+    glass.classList.add("held");
+    view.held = performance.now();
+    glass.addEventListener("pointermove", move);
+    glass.addEventListener("lostpointercapture", () => {
+      glass.removeEventListener("pointermove", move);
+      glass.classList.remove("held");
+      if (view.deadline != null) view.deadline += performance.now() - view.held;
+      view.held = null;
+      const from = glass.style.translate || "0 0";
+      glass.style.translate = "";
+      glass.animate([{ translate: from }, { translate: "0 0" }], { id: "home", duration: still() ? 150 : 650, easing: still() ? "ease-out" : SPRING });
+    }, { once: true });
+  });
+}
 
 async function openWalk(id) {
   cancelAnimationFrame(view.raf);
@@ -506,7 +685,7 @@ async function openWalk(id) {
   }
   const reading = store.get("reading", {})[id];
   const resumeAt = reading && reading.version === walk.version ? walk.stops.findIndex((s) => s.n === reading.n) : -1;
-  view = { kind: "walk", id, walk, cur: 0, mode: resumeAt > 0 ? "manual" : "auto", seenStops: new Set() };
+  view = { kind: "walk", id, walk, cur: 0, mode: resumeAt > 0 ? "manual" : "auto", seenStops: new Set(), held: null, range: [] };
   markSeen([id]); updateBadge();
   renderWalkShell();
   go(resumeAt > 0 ? resumeAt : Math.max(0, walk.stops.findIndex((s) => PLAYABLE.has(s.status))));
