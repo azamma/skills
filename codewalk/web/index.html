@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Codewalk</title>
+<link rel="stylesheet" href="/static/app.css">
+<script type="module" src="/static/app.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#/"><span class="logo" aria-hidden="true">c</span>codewalk</a>
+  <a class="tab" href="#/" aria-current="page">
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="19" r="2.5"/><path d="M8.5 19h8a3.5 3.5 0 0 0 0-7h-9a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="2.5"/></svg>
+    Walks <span class="count-badge" id="unseen-count" hidden></span>
+  </a>
+  <span class="right"><span class="dot" id="live-dot" aria-hidden="true"></span><span id="live-text">local · read-only</span></span>
+</header>
+<main id="view" tabindex="-1"></main>
+<div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+<dialog id="move-dialog" class="dialog">
+  <form method="dialog">
+    <h2>Move to folder</h2>
+    <label for="move-input">Folder</label>
+    <input id="move-input" name="folder" list="folder-list" autocomplete="off" maxlength="80" placeholder="Type a name, or pick one">
+    <datalist id="folder-list"></datalist>
+    <p class="hint">A new name makes a new folder. One level only.</p>
+    <div class="actions">
+      <button class="btn ghost" value="loose" type="submit">Take out of its folder</button>
+      <button class="btn ghost" value="cancel" type="submit">Cancel</button>
+      <button class="btn primary" value="move" type="submit">Move</button>
+    </div>
+  </form>
+</dialog>
+</body>
+</html>

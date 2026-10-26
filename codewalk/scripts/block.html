@@ -1,0 +1,299 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Walk block: always dark, paints its own background and does not depend on the page that hosts it */
+.cw {
+  --bg: #0C0D0F; --ink: #ECEDEF; --ink2: #9AA0A8; --ink3: #7E848C; --line: #FFFFFF1F;
+  --code: #1E1F22; --chead: #2B2D30; --chip: #FFFFFF1F; --chipink: #E6E7EA; --no: #8B9099; --noin: #C9CCD2;
+  --band: #1F6FD12E; --rule: #3FA9F5; --pband: #FF7A452E; --prule: #FF8A5C;
+  --cw-blue: #3FA9F5; --cw-orange: #FF8A5C;
+  --nbg: #1F6FD1; --nink: #FFFFFF; --pnbg: #FF7A45; --pnink: #0C0D0F; --refbg: #FFFFFF14;
+  --syn-keyword: #CF8E6D; --syn-string: #6AAB73; --syn-comment: #7A7E85; --syn-doc: #5F826B; --syn-annotation: #B3AE60;
+  --syn-number: #2AACB8; --syn-function: #56A8F5; --syn-property: #C77DBB; --def: #BCBEC4;
+  --glow: #3FA9F533; --aur1: #3FA9F552; --aur2: #FF7A4542; --aur3: #2AACB83D; --halo: #3FA9F526; --drop: #00000066;
+  --edge1: #3FA9F5CC; --edge2: #FF8A5CCC; --edge0: #FFFFFF14;
+  --sans: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  position: relative; isolation: isolate; overflow: hidden; overflow: clip; margin: 32px 0; padding: 28px 28px 22px;
+  background: var(--bg); color: var(--ink); color-scheme: dark; border: 1px solid var(--line); border-radius: 14px;
+  font: 16px/1.55 var(--sans); text-align: left; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.cw, .cw *, .cw *::before, .cw *::after { box-sizing: border-box; }
+.cw .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.cw svg { flex: none; }
+.cw .syn-keyword { color: var(--syn-keyword); } .cw .syn-string { color: var(--syn-string); }
+.cw .syn-comment { color: var(--syn-comment); font-style: italic; } .cw .syn-doc { color: var(--syn-doc); font-style: italic; }
+.cw .syn-annotation { color: var(--syn-annotation); } .cw .syn-number { color: var(--syn-number); }
+.cw .syn-function { color: var(--syn-function); } .cw .syn-property { color: var(--syn-property); }
+.cw .syn-static { color: var(--syn-property); font-style: italic; }
+
+.cw .cw-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 0 0 28px; font-size: 13px; }
+.cw .cw-head svg { color: var(--cw-blue); }
+.cw .cw-head strong { font-weight: 600; }
+.cw .cw-head span { color: var(--ink2); }
+
+.cw .cw-body { position: relative; }
+.cw .cw-stops { min-width: 0; position: relative; z-index: 1; list-style: none; margin: 0; padding: 0 0 0 30px; display: grid; gap: 40px; }
+.cw .cw-stop { min-width: 0; margin: 0; padding: 0; }
+.cw .cw-change { margin: 0 0 10px; max-width: none; font: 12px/1.3 var(--mono); color: var(--cw-orange); }
+.cw .cw-change.back { color: var(--cw-blue); }
+.cw .cw-meta { display: flex; align-items: center; gap: 6px; margin-left: -30px; }
+.cw .cw-n { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  background: var(--nbg); color: var(--nink); font: 500 12px/1 var(--mono); }
+.cw [data-peak] .cw-n { background: var(--pnbg); color: var(--pnink); }
+.cw .cw-where { font: 12px/1.3 var(--mono); color: var(--ink2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.cw .cw-anchor { color: var(--ink3); display: grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; opacity: 0;
+  text-decoration: none; transition: opacity .15s, background-color .15s; }
+.cw .cw-stop:hover .cw-anchor, .cw .cw-anchor:focus-visible, .cw .cw-stop.is-on .cw-anchor { opacity: 1; }
+.cw .cw-anchor:hover { background: var(--line); }
+.cw .cw-anchor[data-copied]::after { content: "Link copied"; position: absolute; transform: translate(34px, 0); font: 12px var(--sans);
+  color: var(--ink2); white-space: nowrap; }
+.cw .cw-copy { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; padding: 3px 8px; border: 1px solid var(--line);
+  border-radius: 6px; background: none; color: var(--ink2); font: 500 12px/1.2 var(--sans); cursor: pointer; white-space: nowrap; }
+.cw .cw-copy:hover { color: var(--ink); background: var(--line); }
+.cw .cw-copy:focus-visible { outline: 2px solid var(--rule); outline-offset: 2px; }
+.cw .cw-copy[data-copied] { color: var(--cw-blue); border-color: var(--cw-blue); }
+.cw .cw-phrase { margin: 10px 0 14px; max-width: 34ch; color: var(--ink); }
+.cw [data-peak] .cw-phrase { font-size: 19px; font-weight: 600; line-height: 1.45; }
+.cw .cw-phrase code, .cw .cw-close code { font: 500 .85em var(--mono); background: var(--refbg); padding: 1px 3px; border-radius: 4px; }
+
+/* Code panel */
+.cw .cw-fig { min-width: 0; max-width: 100%; margin: 0; background: var(--code); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.cw .cw-fig figcaption { display: flex; align-items: center; gap: 8px; padding: 9px 14px; background: var(--chead);
+  font: 12px/1.3 var(--mono); min-width: 0; }
+.cw .cw-chip { background: var(--chip); color: var(--chipink); padding: 2px 7px; border-radius: 5px; white-space: nowrap; }
+.cw .cw-file { color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.cw .cw-rng { color: var(--ink2); white-space: nowrap; }
+.cw .cw-manual { display: block; width: 100%; padding: 6px 14px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0;
+  background: var(--code); color: var(--ink); font: 12px/1.4 var(--mono); }
+.cw .cw-pre { overflow: hidden; font: 12.5px/20px var(--mono); font-variant-ligatures: none; padding: 8px 0; color: var(--def); }
+.cw .cw-pre:focus-visible { outline: 2px solid var(--rule); outline-offset: -2px; }
+.cw .l { position: relative; padding-left: calc(54px + var(--i) * 1ch); white-space: pre; overflow: hidden; color: var(--def);
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 44px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 44px), transparent); }
+.cw .l::before { content: attr(data-n); position: absolute; left: 0; width: 40px; text-align: right; color: var(--no); text-indent: 0; }
+.cw .l.in { white-space: pre-wrap; padding-left: calc(54px + var(--i) * 1ch + 4ch); text-indent: -4ch; background: var(--band);
+  box-shadow: inset 2px 0 var(--rule); overflow-wrap: anywhere; -webkit-mask-image: none; mask-image: none; }
+.cw .l.in::before { color: var(--noin); }
+.cw [data-peak] .l.in { background: var(--pband); box-shadow: inset 2px 0 var(--prule); }
+.cw .ref { text-decoration: underline 1.5px; text-underline-offset: 3px; }
+
+.cw .cw-close, .cw .cw-foot { display: flex; gap: 10px; align-items: baseline; margin: 32px 0 0; max-width: none; font-size: 13px; color: var(--ink2); }
+.cw .cw-close svg, .cw .cw-foot svg { position: relative; top: 2px; color: var(--cw-blue); }
+.cw .cw-close { color: var(--ink); }
+.cw .cw-foot { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font: 12px/1.5 var(--mono); }
+.cw .cw-foot svg { color: var(--ink3); }
+
+.cw .cw-route, .cw .cw-sky { display: none; }
+
+/* Screen: on desktop each stop carries its code beside it */
+@media screen {
+  .cw .cw-fig { box-shadow: 0 14px 36px var(--drop); }
+  .cw .cw-fig .cw-count { color: var(--ink2); white-space: nowrap; }
+  .cw .cw-fig .cw-count b { font-weight: 500; color: var(--cw-blue); }
+  .cw [data-peak] .cw-fig .cw-count b { color: var(--cw-orange); }
+  @media (min-width: 760px) {
+    .cw .cw-stops { gap: 96px; }
+    .cw .cw-stop { display: grid; grid-template-columns: minmax(220px, 290px) minmax(0, 1fr); grid-template-rows: repeat(3, min-content) 1fr;
+      column-gap: 44px; align-items: start; }
+    .cw .cw-stop > * { grid-column: 1; }
+    .cw .cw-stop > .cw-fig { grid-column: 2; grid-row: 1 / span 4; }
+    .cw .cw-stop[data-peak] { margin-block: 48px; }
+  }
+  @media (max-width: 759px) {
+    .cw { padding: 22px 16px 18px; }
+    .cw .cw-pre { font-size: 12px; }
+    .cw .cw-fig .cw-count { display: none; }
+    .cw .cw-fig .cw-copy span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .cw .cw-fig .cw-copy { position: relative; }
+    .cw .cw-fig .cw-copy[data-copied]::after { content: "Copied"; position: absolute; right: 0; top: calc(100% + 4px); padding: 2px 6px; border-radius: 4px; background: var(--chead); color: var(--ink); font-size: 12px; }
+    .cw .l { padding-left: calc(44px + var(--i) * 1ch); }
+    .cw .l.in { padding-left: calc(44px + var(--i) * 1ch + 4ch); }
+    .cw .l::before { width: 32px; }
+  }
+
+  /* Decoration: only when motion is allowed (the script sets .is-live) */
+  .cw.is-live .cw-stop.is-on .cw-n { box-shadow: 0 0 0 4px var(--bg), 0 0 14px 4px var(--glow); }
+  .cw.is-live .cw-stop.is-on .cw-fig { --a: 0deg; border-color: transparent; box-shadow: 0 14px 36px var(--drop), 0 0 34px var(--halo);
+    background: linear-gradient(var(--code), var(--code)) padding-box,
+      conic-gradient(from calc(120deg + var(--a)), var(--edge1), transparent 22%, var(--edge0) 40%, var(--edge2) 55%, transparent 78%, var(--edge1)) border-box;
+    animation: cw-beam 14s linear infinite; }
+  .cw.is-live .cw-stop[data-peak].is-on .cw-fig { --halo: #FF7A4526; }
+
+  .cw.is-live .cw-route { display: block; z-index: 1; position: absolute; left: 0; top: 0; width: 30px; overflow: visible; pointer-events: none; }
+  .cw .cw-route path { fill: none; stroke-width: 2; stroke-linecap: round; }
+  .cw .cw-route .rest { stroke: var(--line); }
+  .cw .cw-route .spark { fill: var(--cw-blue); filter: drop-shadow(0 0 6px var(--cw-blue)); }
+
+  .cw.is-live .cw-sky { display: block; position: absolute; top: 0; bottom: 0; pointer-events: none; overflow: hidden;
+    -webkit-mask-image: linear-gradient(transparent, #000 12%, #000 88%, transparent); mask-image: linear-gradient(transparent, #000 12%, #000 88%, transparent); }
+  /* each glow is two colours that turn, stretch and blend into the next one (screen) */
+  .cw .cw-sky i { position: absolute; opacity: .55; mix-blend-mode: screen;
+    background: radial-gradient(closest-side at 38% 40%, var(--c), transparent), radial-gradient(closest-side at 64% 62%, var(--c2), transparent);
+    transition: opacity 1.2s; animation: cw-morph 22s ease-in-out infinite alternate; will-change: transform, translate, rotate, scale; }
+  .cw .cw-sky i.is-on { opacity: 1; }
+  .cw .cw-sky i:nth-child(2n) { animation-duration: 27s; animation-direction: alternate-reverse; animation-delay: -6s; }
+  .cw .cw-sky i:nth-child(3n) { animation-duration: 17s; animation-delay: -11s; }
+}
+@property --a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes cw-beam { to { --a: 360deg; } }
+@keyframes cw-morph {
+  0% { translate: -12% -8%; rotate: 0deg; scale: 1 1; }
+  35% { translate: 10% -6%; rotate: 50deg; scale: 1.22 .82; }
+  70% { translate: -4% 11%; rotate: 115deg; scale: .86 1.2; }
+  100% { translate: 12% 6%; rotate: 170deg; scale: 1.12 .94; } }
+@media (prefers-reduced-motion: reduce) { .cw .cw-fig, .cw .cw-sky i { animation: none; } }
+@media print { .cw .cw-anchor, .cw .cw-copy, .cw .cw-manual { display: none; } .cw .l { white-space: pre-wrap; -webkit-mask-image: none; mask-image: none; } }
+</style>
+<!--BLOCK-->
+<script>
+(() => {
+  // one copy of this code per page: every block carries its own, the guard keeps it from starting twice
+  if (window.__cwBlock) return window.__cwBlock();
+  const motionOk = matchMedia("(prefers-reduced-motion: no-preference)");
+  const narrow = matchMedia("(max-width: 759px)");
+
+  // Copy to the clipboard; when the host forbids it (an artifact in an iframe), show the reference selected to copy by hand.
+  async function copy(text, fig) {
+    try { await navigator.clipboard.writeText(text); return true; } catch {}
+    const box = fig.querySelector(".cw-manual") || fig.insertBefore(document.createElement("input"), fig.querySelector(".cw-pre"));
+    box.className = "cw-manual"; box.readOnly = true; box.value = text;
+    box.setAttribute("aria-label", "Reference to copy by hand");
+    box.onkeydown = (e) => { if (e.key === "Escape") box.remove(); };
+    setTimeout(() => box.remove(), 12000);
+    box.focus(); box.select();
+    try { if (document.execCommand("copy")) { box.remove(); return true; } } catch {}
+    return false;
+  }
+
+  function init(cw) {
+    cw.dataset.ready = "";
+    const body = cw.querySelector(".cw-body");
+    const stops = [...cw.querySelectorAll(".cw-stop")];
+    const route = cw.querySelector(".cw-route");
+    const [rest, done] = route.querySelectorAll("path");
+    const spark = route.querySelector(".spark");
+    const sky = cw.querySelector(".cw-sky");
+    let blobs = [];
+    let cur = 0, len = 0, raf = 0;
+
+    const live = () => cw.classList.contains("is-live");
+    const readY = () => innerHeight * (narrow.matches ? 0.68 : 0.5);
+    const nodeOf = (s) => s.querySelector(".cw-n");
+
+    function show(i) {
+      cur = i;
+      stops.forEach((x, k) => x.classList.toggle("is-on", k === i - 1));
+      blobs.forEach((b, k) => b.classList.toggle("is-on", k === i - 1));
+    }
+
+    function drawRoute() {
+      const b = body.getBoundingClientRect();
+      const pts = stops.map((s) => { const r = nodeOf(s).getBoundingClientRect(); return [r.left + r.width / 2 - b.left, r.top + r.height / 2 - b.top]; });
+      const x0 = pts[0][0];
+      const y0 = pts[0][1] - Math.min(90, pts[0][1]);  // starts at most 90px above, inside the body
+      let d = `M ${x0} ${y0}`;
+      let prevPt = [x0, y0];
+      pts.forEach(([x, y], k) => {
+        const w = k % 2 ? 9 : -9, dy = y - prevPt[1];
+        d += ` C ${prevPt[0] + w} ${prevPt[1] + dy * 0.4}, ${x - w} ${y - dy * 0.4}, ${x} ${y}`;
+        prevPt = [x, y];
+      });
+      d += ` C ${prevPt[0] + 9} ${prevPt[1] + 40}, ${prevPt[0] - 6} ${prevPt[1] + 80}, ${prevPt[0]} ${prevPt[1] + 110}`;
+      rest.setAttribute("d", d); done.setAttribute("d", d);
+      route.setAttribute("height", b.height);
+      // one glow per stop, alternating sides; the peak is orange. The sky spans the whole block
+      const c = cw.getBoundingClientRect(), W = cw.clientWidth, wide = !narrow.matches;
+      Object.assign(sky.style, { left: c.left + cw.clientLeft - b.left + "px", width: W + "px" });
+      sky.replaceChildren();
+      blobs = pts.map(([, y], k) => {
+        const i = document.createElement("i");
+        const w = wide ? 640 : 360, h = wide ? 520 : 340;
+        const peak = stops[k].hasAttribute("data-peak");
+        const x = wide ? (k % 2 ? W * 0.58 : W * 0.04) : (k % 2 ? W * 0.3 : -W * 0.3);
+        Object.assign(i.style, { width: w + "px", height: h + "px", left: x + "px", top: y - h / 2 + "px" });
+        const [c1, c2] = peak ? ["--aur2", "--aur1"] : k % 2 ? ["--aur3", "--aur1"] : ["--aur1", "--aur3"];
+        i.style.setProperty("--c", `var(${c1})`); i.style.setProperty("--c2", `var(${c2})`);
+        sky.append(i);
+        return i;
+      });
+      const tail = document.createElement("i");
+      Object.assign(tail.style, { width: "520px", height: "420px", left: W * 0.36 + "px", top: b.height - 380 + "px" });
+      tail.style.setProperty("--c", "var(--aur2)"); tail.style.setProperty("--c2", "var(--aur3)");
+      sky.append(tail);
+      len = done.getTotalLength();
+      done.style.strokeDasharray = `${len} ${len}`;
+    }
+
+    function lengthAtY(y) {
+      let lo = 0, hi = len;
+      for (let k = 0; k < 22; k++) { const m = (lo + hi) / 2; done.getPointAtLength(m).y < y ? (lo = m) : (hi = m); }
+      return lo;
+    }
+
+    function tick() {
+      if (!live()) return;
+      const y = readY();
+      let i = 1;
+      stops.forEach((s, k) => { if (nodeOf(s).getBoundingClientRect().top <= y) i = k + 1; });
+      if (i !== cur) show(i);
+      const mid = innerHeight / 2;
+      for (const el of sky.children) {
+        const r = el.getBoundingClientRect();
+        el.style.transform = `translateY(${((r.top + r.height / 2 - mid) * -0.18).toFixed(1)}px)`;
+      }
+      const l = lengthAtY(y - body.getBoundingClientRect().top);
+      done.style.strokeDashoffset = len - l;
+      const p = done.getPointAtLength(l);
+      spark.setAttribute("cx", p.x); spark.setAttribute("cy", p.y);
+      spark.style.opacity = l > 2 && l < len - 2 ? 1 : 0;
+    }
+
+    function goTo(i) {
+      const s = stops[i - 1];
+      if (!s) return;
+      if (!live()) return s.scrollIntoView({ behavior: "smooth", block: "start" });
+      scrollTo({ top: scrollY + nodeOf(s).getBoundingClientRect().top - readY() + 2, behavior: motionOk.matches ? "smooth" : "auto" });
+    }
+
+    function setMode() {
+      cw.classList.toggle("is-live", motionOk.matches);
+      if (live()) { drawRoute(); cur = 0; tick(); } else stops.forEach((x) => x.classList.remove("is-on"));
+    }
+
+    addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; tick(); }); }, { passive: true });
+    addEventListener("resize", () => { if (live()) { drawRoute(); tick(); } });
+    motionOk.addEventListener("change", setMode);
+
+    // Copies "path/from/the/root/File.ext:line": most editors open it at that line from their go-to-file box.
+    cw.addEventListener("click", async (e) => {
+      const b = e.target.closest(".cw-copy");
+      if (b) {
+        if (!(await copy(b.dataset.ref, b.closest(".cw-fig")))) return;
+        const label = b.querySelector("span");
+        b.dataset.copied = ""; label.textContent = "Copied";
+        setTimeout(() => { delete b.dataset.copied; label.textContent = "Copy ref"; }, 1400);
+        return;
+      }
+      const a = e.target.closest(".cw-anchor");
+      if (!a) return;
+      e.preventDefault();
+      const hash = a.getAttribute("href");
+      try { history.replaceState(null, "", hash); } catch {}
+      goTo(Number(a.closest(".cw-stop").dataset.n));
+      if (await copy(location.href.split("#")[0] + hash, a.closest(".cw-stop").querySelector(".cw-fig"))) {
+        a.dataset.copied = ""; setTimeout(() => delete a.dataset.copied, 1400);
+      }
+    });
+
+    (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => {
+      setMode();
+      const h = location.hash.slice(1), pre = cw.id + "-stop-";
+      if (h.startsWith(pre)) goTo(Number(h.slice(pre.length)));
+    });
+  }
+
+  window.__cwBlock = () => document.querySelectorAll(".cw:not([data-ready])").forEach(init);
+  window.__cwBlock();
+})();
+</script>
