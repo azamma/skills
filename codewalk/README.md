@@ -34,7 +34,7 @@ where it ends with [Pygments](https://pygments.org/).
 | Function in a module or package | `slugs#slugify`, `parser#Parse` |
 | Path with lines | `config/limits.yml:3-8` |
 
-## For someone without the repos
+## For someone without the repositories
 
 When the answer goes into an artifact, `block` renders the same walk as one self-contained HTML block: code highlighted,
 always dark, with a peak stop and a closing line.

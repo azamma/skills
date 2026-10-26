@@ -37,7 +37,7 @@ y lee dónde termina con [Pygments](https://pygments.org/).
 | Función de un módulo o paquete | `slugs#slugify`, `parser#Parse` |
 | Ruta con líneas | `config/limits.yml:3-8` |
 
-## Para quien no tiene los repos
+## Para quien no tiene los repositorios
 
 Cuando la respuesta va en un artifact, `block` arma el mismo walk como un bloque HTML autocontenido: código resaltado,
 siempre oscuro, con una parada pico y una frase de cierre.
